@@ -260,9 +260,3 @@ def success_prob_int(string):
 def s(string):
     return str(success_prob_int(string)) + "%"
 
-
-f_str = "bsadpc"
-for it in itertools.product(f_str, f_str, f_str):
-    out = "".join(it)
-    print("%s %s" % (out, s(out)))
-
