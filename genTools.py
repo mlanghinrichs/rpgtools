@@ -259,4 +259,11 @@ def success_prob_int(string):
 
 def s(string):
     return str(success_prob_int(string)) + "%"
+    
+while True:
+	inp = str(input("String to roll? > "))
+	if inp == "quit" or inp == "q":
+		break
+	else:
+		print(s(inp))
 
