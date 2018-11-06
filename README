@@ -2,4 +2,4 @@ This project includes all of my utilities for rpg-tangential work.
 
 genTools.py contains a genesys dice-roller utility and v3 (reduced integer) dice pool probability checker.
 
-goh.py contains a rudimentary Guild of Heroes adventure generator which sources its content from the text files in goh/. ***RUNNING THIS FILE CURRENTLY GENERATES 100 ADVENTURES INTO goh_advs/!***
+goh.py contains a rudimentary Guild of Heroes adventure generator which sources its content from the text files in goh/. 

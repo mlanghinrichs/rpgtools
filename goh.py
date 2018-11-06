@@ -65,7 +65,10 @@ class Adventure:
                 f.write(self.desc())
             print("Wrote to " + path)
 
-for i in range(100):
-    x = Adventure()
-    x.write("goh_advs")
-    print(i)
+new = Adventure()
+print(new.desc())
+
+# for i in range(100):
+#    x = Adventure()
+#    x.write("goh_advs")
+#    print(i)
