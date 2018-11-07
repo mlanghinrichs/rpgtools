@@ -10,7 +10,7 @@ faces = {
     "c": ["", "f", "f", "ff", "ff", "d", "d", "fd", "fd", "dd", "dd", "D"]  # Challenge die faces
 }
 
-
+# Timer wrapper for debugging hefty probability functions
 def time_me(f):
     @wraps(f)
     def dec(*args, **kwargs):
@@ -24,15 +24,6 @@ def time_me(f):
         return r
     return dec
 
-
-def bar_before(f):
-    @wraps(f)
-    def dec(*args, **kwargs):
-        print("\n================")
-        return f(*args, **kwargs)
-    return dec
-
-
 def std_inp(string):
     """
     Replaces alternate letter inputs with standard versions.
@@ -40,10 +31,12 @@ def std_inp(string):
     # Replacement values a -> b
     repls = [("y", "p"), ("g", "a"), ("r", "c"), ("u", "d")]
 
-
     # For each letter-pair tuple, replace all of a in input with b
     for tup in repls:
         string = string.replace(*tup)
+
+	# Filter bad letters
+    string = ''.join(c for c in string if c in 'pacdsb')
 
     # Return the fixed string
     return string
@@ -82,7 +75,7 @@ def clean_roll(symbols):
     Takes an unreduced result pool list and returns one with cancelled out opposites.
     """
 
-    # Utility that removes one each of 1 or 2 values from arg list
+    # Utility func to remove one each of 1 or 2 values from arg list
     def cancel(*args):
         for x in args:
             symbols.remove(x)
@@ -214,12 +207,13 @@ def success_prob_int(string):
     Given a string of dice to roll, return the probability of a successful result on that check using integers.
     """
 
-    if len(string) > 8:
-        print("String is too long! Keep it <= 8 dice")
-        return
-
     # Standardize the input string
     string = std_inp(string)
+
+    # Confirm string length 0<x<9
+    if not (len(string) > 0 and len(string) < 9):
+    	print('String is too short or too long! Length: {}'.format(len(string)))
+    	return
 
     # Empty list of possible pools given string
     p_pools = []

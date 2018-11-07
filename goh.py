@@ -43,9 +43,10 @@ class Adventure:
         out += "\nIn {}, in {};".format(r['locales'], r['sub_locales'])
         out += "\nA {}, to {}.".format(r['plot'], r['objective'])
         out += "\n"
-        # Generalizable to any # of hours
+        # Generalizable to any # of hours; uncomment line to add modular detail lines
         for n in range(len(r['hours'])):
             out += "\nIn hour {}, {}.".format(n+1, r['hours'][n])
+            # out += "\n\ta.\n\tb.\n\tc.\n\td.\n\te."
         out += "\n\nRandom elements:"
         # Generalizable to any # of elements
         for n in range(len(r['story_elements'])):
