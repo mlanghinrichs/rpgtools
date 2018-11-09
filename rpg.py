@@ -36,12 +36,27 @@ def ngen_l(list_):
     else:
         return "No name..."
 
-def ngen_f(filename):
+def ngen_f(filename, number=0):
     """n(ame)gen_f(ile) - Pass a file, return a string with generated name."""
     namelist = tbl(filename)
-    if namelist[0] == "LIST":
-        return choice(namelist)
+    if not number:
+        if namelist[0] == "LIST":
+            namelist.remove("LIST")
+            return choice(namelist)
+        else:
+            return ngen_l(namelist)
     else:
-        ngen_l(namelist)
+        output = []
+        if namelist[0] == "LIST":
+            namelist.remove("LIST")
+            for i in range(number):
+                output.append(choice(namelist))
+            return output
+        else:
+            for i in range(number):
+                output.append(ngen_l(namelist))
+            return output
 
-print(ngen_f("tbls/names/fantasy_dwarf_male.txt"))
+
+for name in ngen_f("tbls/names/fantasy_dwarf_male.txt", 40):
+    print(name)
