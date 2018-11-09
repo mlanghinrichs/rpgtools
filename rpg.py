@@ -2,14 +2,19 @@ from random import choice
 
 def tbl(filename):
     """Return list with \\n stripped from lines in filename, making a 'table' to roll."""
-    with open(filename, "r") as f:
 
-        output = []
+    output = []
 
-        for line in f.readlines():
-            line = line[:-1] # Strip last char (probably newline)
-            if len(line): # Check for empty line before appending
-                output.append(line)
+    try:
+        with open(filename, "r") as f:
+
+            for line in f.readlines():
+                line = line[:-1] # Strip last char (probably newline)
+                if len(line): # Check for empty line before appending
+                    output.append(line)
+    except FileNotFoundError:
+        # TODO - this is not working
+        output.append("Missing file!")
 
         return output
 
@@ -29,12 +34,11 @@ def ngen_l(list_):
     out = ""
     for string in list_:
         out += choice(string.split(" "))
-    if len(out) > 1:
+
+    try:
         return out[0].upper() + out[1:].lower()
-    elif len(out) == 1:
-        return out[0].upper()
-    else:
-        return "No name..."
+    except KeyError:
+        return out.upper()
 
 def ngen_f(filename, number=0):
     """n(ame)gen_f(ile) - Pass a file, return a string with generated name."""
@@ -58,5 +62,30 @@ def ngen_f(filename, number=0):
             return output
 
 
-for name in ngen_f("tbls/names/fantasy_dwarf_male.txt", 40):
-    print(name)
+def ngen_fkeys(path, *args):
+    
+    fullpath = path
+    for arg in args:
+        fullpath += arg
+        if not args[-1] == arg:
+            fullpath += "_"
+    fullpath += ".txt"
+
+    return ngen_f(fullpath)
+
+
+
+class Character:
+
+    def __init__(self, *, setting="fantasy", race="human", gender="male", system="dnd",
+                    chartype="npc", prof="fighter", skills=[], inv=[], stats=[]):
+        self.__dict__.update((k, v) for k,v in vars().items() if k != 'self')
+        self.name = ngen_fkeys("tbls/names/", setting, race, gender)
+        self.surname = ngen_fkeys("tbls/names/", setting, race, gender, "surnames")
+
+
+# for name in ngen_f("tbls/names/fantasy_dwarf_male.txt", 40):
+#     print(name)
+
+x = Character(race="dwarf")
+print(x.name)

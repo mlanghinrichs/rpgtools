@@ -1,5 +1,5 @@
 from random import choice
-import os, rstr
+import os
 
 # Keys establish which files to pull into dict
 goh = dict(locales=[], sub_locales=[], plot=[], objective=[], hours=[], story_elements=[])

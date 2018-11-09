@@ -1,19 +1,19 @@
 class Character(*args, **kwargs):
     request by default: species, gender, system, 
-    Species, Gender
+    /Species, /Gender
     -> Name
     --> List, generator? default names=gen, but can be names="x/"
     -> Age
     Appearance
     Quirks
-    System?:
-    -> NPC Type?
+    /System?:
+    /-> NPC Type?
     --> Characteristics
         dnd: [randint(1,6) for i in range(4)]; list.remove(min(list))
         gsys>minion: shuffle([1, 1, 1, 2, 2, 2])
         gsys>rival: shuffle([1, 2, 2, 2, 3, 3])
         gsys>nemesis: shuffle([2, 2, 3, 3, 3, 3])
-    --> Skills
+    /--> Skills
     --> Items
     if NPC:
     --> Profession
