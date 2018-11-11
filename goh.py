@@ -1,3 +1,4 @@
+# TODO - change self.raw dict in Adventure class to simply be references to self.variables
 from random import choice
 import os
 

@@ -16,7 +16,7 @@ def tbl(filename):
         # TODO - this is not working
         output.append("Missing file!")
 
-        return output
+    return output
 
 
 def c_tbl(filename):
@@ -33,7 +33,7 @@ def ngen_l(list_):
     concatenated."""
     out = ""
     for string in list_:
-        out += choice(string.split(" "))
+        out += choice(string.split(","))
 
     try:
         return out[0].upper() + out[1:].lower()
@@ -81,11 +81,38 @@ class Character:
                     chartype="npc", prof="fighter", skills=[], inv=[], stats=[]):
         self.__dict__.update((k, v) for k,v in vars().items() if k != 'self')
         self.name = ngen_fkeys("tbls/names/", setting, race, gender)
-        self.surname = ngen_fkeys("tbls/names/", setting, race, gender, "surnames")
+        self.surname = ngen_fkeys("tbls/names/", setting, race, "surnames")
 
 
-# for name in ngen_f("tbls/names/fantasy_dwarf_male.txt", 40):
-#     print(name)
+while True:
+    print("Welcome to rpgtools charGen v0.1a. Specify any kwargs you would like to alter below.")
+    print("Input 'n' or 'none' to generate character(s). Input 'q' or 'quit' to end program prematurely.")
 
-x = Character(race="dwarf")
-print(x.name)
+    print("""
+            Available options:
+            setting
+            race
+            gender
+            system
+            char(acter)type
+            prof(ession)
+            """)
+
+    key = ''
+    inpDict = {}
+    while True:
+        key = input("Key to alter: ")
+        if key == 'q' or key == 'quit' or key == 'n' or key == 'none':
+            break
+        else:
+            value = input("Value to set: ")
+            inpDict[key] = value
+            print("")
+    if key == 'q' or key == 'quit':
+        break
+    num = int(input("Number to generate? "))
+    for i in range(num):
+        temp = Character(**inpDict)
+        print(temp.name + " " + temp.surname)
+    break
+
