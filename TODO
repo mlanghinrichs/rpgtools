@@ -1,8 +1,4 @@
 class Character(*args, **kwargs):
-    request by default: species, gender, system, 
-    /Species, /Gender
-    -> Name
-    --> List, generator? default names=gen, but can be names="x/"
     -> Age
     Appearance
     Quirks
@@ -23,4 +19,7 @@ class Character(*args, **kwargs):
     --> Class
     --> Proper stats
 
-Create rpg module with rpg.dnd[x] and rpg.gsys[x], etc, then build generators from that?
+Better comments everywhere
+Eliminate .raw in goh.py
+Merge goh.py with rpg.py?
+Create rpg module with rpg.dnd[x] and rpg.gsys[x]

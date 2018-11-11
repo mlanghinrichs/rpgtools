@@ -40,6 +40,7 @@ class Adventure:
         raw = self.raw
 
         # A block of messy code that creates the description layout and populates it
+        # TODO - make this cleaner with f'' formatting once raw is removed
         out = raw['title']
         out += "\nIn {}, in {};".format(raw['locales'], raw['sub_locales'])
         out += "\nA {}, to {}.".format(raw['plot'], raw['objective'])
