@@ -1,2 +1,0 @@
-rock,horn,foe,gold,iron,gem,glow,ore,mead,axe,storm
-hammer,eater,seeker,heart,born,render,smith,shaper,sworn,blessed

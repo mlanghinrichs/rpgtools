@@ -1,4 +1,11 @@
 from random import choice
+import json
+
+# Import json name data into ndata dict before doing anything else
+ndata = {}
+with open("tbls/names.json", "r") as f:
+    ndata = json.load(f)
+
 
 def tbl(filename):
     """Return list with \\n stripped from lines in filename, making a 'table' to roll."""
@@ -17,13 +24,26 @@ def tbl(filename):
     return output
 
 
-def c_tbl(filename):
-    """Return random element from a loaded file list. Use for one-off rolls."""
-    """For multiple rolls off the same table, load tbl into var and use choice to save
-    system resources."""
+def tbl_json(arg_tuple):
+    """Takes a set of keys in a tuple and returns (list, listtype) tuple from ndata."""
+    """e.g., ('foo', 'bar') as argument would return (ndata['foo']['bar'], 'list') if it
+    found an array and (ndata['foo']['bar'], 'generator') if it found a string. Passed as
+    tuple and not raw args to make passing the input through multiple funcs easier."""
+    current = ndata # working dict starts as ndata
     
-    return choice(tbl(filename))
-
+    try:
+        for arg in arg_tuple: # for each path in the tuple,
+            if isinstance(current[arg], dict): # if it finds a dict, go a level deeper
+                current = current[arg]
+            elif isinstance(current[arg], str): # if it finds a string, return the split list and a generator marker
+                return (current[arg].split(";"), "generator")
+            elif isinstance(current[arg], list): # if it finds a list, return the list and a list marker
+                return (current[arg], "list")
+            else: # if it finds none of these, throw an error
+                raise IndexError('tbl_json called on sequence not ending in a string.')
+    except KeyError:
+        print("Tried to pull a nonexistent generator with tbl_json! Returning ''")
+        return ([''], 'list')
 
 def ngen_l(list_):
     """n(ame)gen_l(ist) - Return a name string generated from inputted generator list."""
@@ -32,15 +52,28 @@ def ngen_l(list_):
     will be concatenated."""
     
     out = ""
-    
+
     for string in list_: # For each line of the generator file,
         out += choice(string.split(",")) # Append one of the options on that line to out
     
     # TODO - make this if/else to avoid sneaky bugs?
     try: # Try to capitalize out properly; if it's < 2 chars, skip this to avoid error 
         return out[0].upper() + out[1:].lower()
-    except KeyError:
+    except IndexError:
         return out.upper()
+
+
+def ngen_j(arg_tuple):
+    """Takes a set of keys in a tuple and returns a generated name from ndata."""
+    inp = tbl_json(arg_tuple)
+
+    # Proper list vs generator behavior - generate from generator, pick from list
+    if inp[1] == "generator":
+        return ngen_l(inp[0])
+    elif inp[1] == "list":
+        return choice(inp[0])
+    else:
+        raise TypeError('Bad/lacking tuple passes to ngen_j!')
 
 
 def ngen_f(filename, number=0):
@@ -96,15 +129,21 @@ class Character:
 
     # Initialize with any number of customized kwargs including skills, inventory, or stats.
     def __init__(self, *, setting="fantasy", race="human", gender="male", system="dnd",
-                    chartype="npc", prof="fighter", skills={}, inv={}, stats={}):
+                    chartype="npc", prof="fighter", namesource=None, skills={}, inv={}, stats={}):
 
         # Import each named var above as a local var for the instance
         self.__dict__.update((k, v) for k,v in vars().items() if k != 'self')
 
         # Generate name and surname from value provided
-        self.name = ngen_fkeys("tbls/names/", setting, race, gender)
-        self.surname = ngen_fkeys("tbls/names/", setting, race, "surnames")
-
+        # self.name = ngen_fkeys("tbls/names/", setting, race, gender)
+        # self.surname = ngen_fkeys("tbls/names/", setting, race, "surnames")
+        if not namesource:
+            self.name = ngen_j((setting, race, gender))
+            self.surname = ngen_j((setting, race, "surnames"))
+        else:
+            self.name = ngen_j((namesource, race, gender))
+            self.surname = ngen_j((namesource, race, "surnames"))
+            
 
 # Main input loop - asks what you want to generate, then (currently) prints name(s) and surname(s)
 while True:

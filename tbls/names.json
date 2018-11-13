@@ -1,0 +1,35 @@
+{
+    "fantasy":
+    {
+        "human":
+        {
+            "male": "hr,k,br,d,t,s,h,c,m,n,;olf,al,ol,om,ad,ar,eg,ad,as,els,ich,ek,a;ed,as,in,e,ver,ol,t,id,,,;in,ar,ius,iel,as,or,,,,,,",
+            "female": "gw,br,d,t,s,h,c,m,n,;at,ol,um,ad,ig,ad,as,els,ich,em;ei,ae,inn,e,va,la,te,idd,ra,;i,el,ia,iel,,,,,",
+            "surnames": ["Alder","Ash","Ashe","Atkinson","Atwood","Ayers","Barnes","Battle","Becker","Berry","Briar","Briggs","Brock","Brook","Brooke","Brooks","Bundy","Burnside","Burroughs","Burrows","Bush","Butler","Clay","Court","Cox","Croft","Cross","Crump","Dale","Dean","Deane","Dike","Dodd","Ford","Forrest","Fox","Freeman","Garside","Gary","Gorsuch","Graves","Green","Greene","Greeves","Gross","Grove","Grover","Hall","Hawthorne","Hazel","Head","Heather","Hill","Holland","Holley","Holly","Holmes","Holt","Homer","Hooke","Hope","House","Howe","Hume","Hyde","Johnston","Kay","Kaye","Keats","Kerry","Kirk","Kirke","Knight","Lamb","Land","Lane","Layne","Lea","Lee","Leigh","Lowell","Malthus","March","Marsh","Marshal","Marshall","Martin","May","Millerchip","Mills","Moore","Newby","Pain","Paine","Payne","Pike","Pitt","Preacher","Provost","Purple","Ridge","Rock","Rose","Roth","Rowen","Seller","Sellers","Shaw","Shore","Thorn","Thorne","Underwood","Wells","West","Whitney","Wild","Wilde","Wood","Woodrow","Woods"]
+        },
+        "dwarf":
+        {
+            "male": "t,y,d,g,h,hr,k,b,;aa,i,o,u,uu;l,m,n,r,,;gar,zan,veld,geld;sen,,,,",
+            "female": "",
+            "surnames": "rock,horn,foe,gold,iron,gem,glow,ore,mead,axe,storm;hammer,eater,seeker,heart,born,render,smith,shaper,sworn,blessed"
+        },
+        "halfling":
+        {
+            "male": "act,aht,oht,agi,eg,ecg,egg,ekk,agin,egin,agil,ail,eil,ala,ald,eald,albi,aelf,elf,alf,alh,alah,ealh,amala,angil,engel,ingal,ingel,athal,adall,aethel,ans,as,ans,os,ar,ara,ari,arni,earn,arb,erb,erf,asc,aesc,audaz,aud,od,euth,auth,euth,ead,eod,jodh,aun,on,ean,aus,aust,eost,bald,baud,bad,bud,baug,berht,beraht,bryht,briht,burg,beorg,bera,bern,berin,beorn,bil,blic,blid,bord,brand,brun,dag,tag,dis,idis,diur,deor,dom,druht,droc,druc,ebur,eber,eofor,era,eri,erin,ern,ercan,erchen,archen,eorcen,erl,eorl,ewa,ew,eu,eo,far,fara,fart,fard,fast,fili,frithu,frith,fridu,flad,flaedh,fram,franc,fraw,fro,frea,fri,frig,freh,frod,frum,fulc,folc,volc,funs,fus,gail,gel,gamal,gam,gaman,gan,gand,gend,gang,gar,ger,earliergais,gard,gast,gaud,gaut,gaus,got,goz,geld,gild,gold,gifu,geb,gib,gisil,gisel,glis,god,got,graus,graw,gra,grim,guma,gunth,gund,gud,gyth,gydh,hag,hagan,hah,haid,heit,hail,heil,hailag,haim,haim,heim,haem,haist,heist,hamar,hand,harc,hard,heard,hari,her,hath,had,hada,hadu,hedan,haidan,helm,heah,hoch,hild,hilp,help,hilt,hilz,helz,himil,hir,hiruz,hiriz,herz,hleo,hlud,hloda,hog,huog,hol,hord,hort,hraban,hram,hrad,hraid,hreid,hring,ring,hroc,roc,hrom,hruom,rom,hroth,hruot,hug,hyg,hun,ing,irm,irmen,erm,ermen,ise,isen,jut,jung,karl,carl,ceorl,koni,cen,coen,kunni,kuni,chun,alsochim,chin,chind,cyne,kunth,cuth,kwik,cwic,laik,laif,laf,leib,laith,lamp,land,laug,lind,liub,leof,liuti,magan,megin,maht,man,mann,meri,maere,mer,mar,mir,mund,noth,nand,raedh,ragin,remez,remis,run,riki,rihhi,ric,sax,seax,sinth,sind,sith,sig,sigi,sige,stan,swint,swith,tank,trygg,wand,wandal,weald,warin,weard,wiht,wil,win,wini,wine,wynn,wyn,wig,wala,wel,wael,wod,wid(u),wit,wulf,theod,thegnaz,degen,thryth,thrudhr,thrydh,drut,trud,thrud,thryth;act,aht,oht,agi,eg,ecg,egg,ekk,agin,egin,agil,ail,eil,ala,ald,eald,albi,aelf,elf,alf,alh,alah,ealh,amala,angil,engel,ingal,ingel,athal,adall,aethel,ans,as,ans,os,ar,ara,ari,arni,earn,arb,erb,erf,asc,aesc,audaz,aud,od,euth,auth,euth,ead,eod,jodh,aun,on,ean,aus,aust,eost,bald,baud,bad,bud,baug,berht,beraht,bryht,briht,burg,beorg,bera,bern,berin,beorn,bil,blic,blid,bord,brand,brun,dag,tag,dis,idis,diur,deor,dom,druht,droc,druc,ebur,eber,eofor,era,eri,erin,ern,ercan,erchen,archen,eorcen,erl,eorl,ewa,ew,eu,eo,far,fara,fart,fard,fast,fili,frithu,frith,fridu,flad,flaedh,fram,franc,fraw,fro,frea,fri,frig,freh,frod,frum,fulc,folc,volc,funs,fus,gail,gel,gamal,gam,gaman,gan,gand,gend,gang,gar,ger,earliergais,gard,gast,gaud,gaut,gaus,got,goz,geld,gild,gold,gifu,geb,gib,gisil,gisel,glis,god,got,graus,graw,gra,grim,guma,gunth,gund,gud,gyth,gydh,hag,hagan,hah,haid,heit,hail,heil,hailag,haim,haim,heim,haem,haist,heist,hamar,hand,harc,hard,heard,hari,her,hath,had,hada,hadu,hedan,haidan,helm,heah,hoch,hild,hilp,help,hilt,hilz,helz,himil,hir,hiruz,hiriz,herz,hleo,hlud,hloda,hog,huog,hol,hord,hort,hraban,hram,hrad,hraid,hreid,hring,ring,hroc,roc,hrom,hruom,rom,hroth,hruot,hug,hyg,hun,ing,irm,irmen,erm,ermen,ise,isen,jut,jung,karl,carl,ceorl,koni,cen,coen,kunni,kuni,chun,alsochim,chin,chind,cyne,kunth,cuth,kwik,cwic,laik,laif,laf,leib,laith,lamp,land,laug,lind,liub,leof,liuti,magan,megin,maht,man,mann,meri,maere,mer,mar,mir,mund,noth,nand,raedh,ragin,remez,remis,run,riki,rihhi,ric,sax,seax,sinth,sind,sith,sig,sigi,sige,stan,swint,swith,tank,trygg,wand,wandal,weald,warin,weard,wiht,wil,win,wini,wine,wynn,wyn,wig,wala,wel,wael,wod,wid(u),wit,wulf,theod,thegnaz,degen,thryth,thrudhr,thrydh,drut,trud,thrud,thryth"
+        },
+        "halforc":
+        {
+            "male": "d,m,n,b,p,gr,j;ex,olc,art,oarn,arl,arce,egg;onax,kodd,,,,,,,,,,"
+        }
+    },
+    "steampunk":
+    {
+        "human":
+        {
+            "male": "w,c,g,s,p,b;a,e,ui,y,u;x,ph,ll,d,tt,r;i,a,ia,ou;l,ll,nd,m;ium,ius,os,e",
+            "female": ["Cassandra","Evelyn","Prouessa","Delphine","Olivia","Penance","Stellana","MaryEllis","Crimenzia"],
+            "surnames": "whitte,south,le,chiffen,mere,broad,crane;man,more,brook,ville,den,burrow,stable,,"
+        }
+    },
+    "modern": ""
+}
