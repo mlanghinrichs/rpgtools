@@ -1,5 +1,5 @@
-import random, time, itertools
-from functools import wraps
+import random, itertools, time
+from debug import time_me
 
 faces = {
     "b": ["", "", "s", "sa", "aa", "a"],  # Boost die faces
@@ -10,19 +10,6 @@ faces = {
     "c": ["", "f", "f", "ff", "ff", "d", "d", "fd", "fd", "dd", "dd", "D"]  # Challenge die faces
 }
 
-# Timer wrapper for debugging hefty probability functions
-def time_me(f):
-    @wraps(f)
-    def dec(*args, **kwargs):
-        # Initiate stopwatch (ms)
-        curr = int(round(time.time() * 1000))
-
-        r = f(*args, **kwargs)
-
-        # Clock out (ms)
-        print("Time elapsed: %d" % (int(round(time.time() * 1000)) - curr))
-        return r
-    return dec
 
 def std_inp(string):
     """
@@ -42,9 +29,9 @@ def std_inp(string):
     return string
 
 
-def raw_roll(string):
+def roll(string):
     """
-    Take a passed string, roll dice and return list of unreduced results.
+    Take a passed string, roll dice and return list of results.
     """
 
     # Clean up input to avoid bad letters
@@ -63,22 +50,7 @@ def raw_roll(string):
 
     # Join all results, as some are multiple letters, then resplit
     n = "".join(results)
-    results = list(n)
-    # results.sort()  # Group dice by type - not necessary
-
-    # Return sorted results
-    return results
-
-
-def clean_roll(symbols):
-    """
-    Takes an unreduced result pool list and returns one with cancelled out opposites.
-    """
-
-    # Utility func to remove one each of 1 or 2 values from arg list
-    def cancel(*args):
-        for x in args:
-            symbols.remove(x)
+    symbols = list(n)
 
     # For each triumph, add a success
     for n in range(symbols.count("T")):
@@ -87,6 +59,11 @@ def clean_roll(symbols):
     # For each despair, add a failure
     for n in range(symbols.count("D")):
         symbols.append("f")
+
+# Utility func to remove one each of 1 or 2 values from arg list
+    def cancel(*args):
+        for x in args:
+            symbols.remove(x)
 
     # Iterate results until all opp symbol pairs are cancelled
     while True:
@@ -145,64 +122,8 @@ def describe(pool):
     return output
 
 
-def roll(string):
-    n = raw_roll(string)
-    final = clean_roll(n)
-
-    print(describe(final))
-    return (n, final)
-
-
-#def success_prob(string):
-#    """
-#    Given a string of dice to roll, return the probability of a successful result on that check.
-#    :param string:
-#    :return:
-#    """
-#
-#    # Standardize the input string
-#    string = std_inp(string)
-#
-#    # Empty list of possible pools given string
-#    p_pools = []
-#
-#    # Initiate stopwatch (ms)
-#    curr = int(round(time.time() * 1000))
-#
-#    # For each letter in the string...
-#    for let in string:
-#        if len(p_pools) > 0:    # If there are already sample pools in the list,
-#            temp_list = []      # 1. Create a holding list
-#            for s in p_pools:   # 2. Then for each pre-existing sample pool,
-#                for f in faces[let]:    # 3. For each possible roll,
-#                    temp_list.append(s + f)     # 4. Add one new pool to the holding list
-#            p_pools = temp_list     # 4. Then set the full pool list to equal the holding list
-#        else:
-#            for f in faces[let]:
-#                p_pools.append(f)
-#
-#    # Tally of successful pools
-#    success = 0
-#
-#    # Check in on stopwatch (ms)
-#    print("Gen'd, pre-count %d" % (int(round(time.time() * 1000)) - curr))
-#
-#    # For each pool in p_pools, check if it's successful and increment success tally if it is
-#    for r in p_pools:
-#        if r.count("s") + r.count("T") > r.count("f") + r.count("D"):
-#            success += 1
-#
-#    # Check in on stopwatch (ms)
-#    print("Post-count %d" % (int(round(time.time() * 1000)) - curr))  # Timer
-#
-#    # Calculate % of pools which are successful and return a rounded percentage
-#    prob = success/len(p_pools)
-#    return round(100*prob, 2)
-
-
-# @bar_before
-# @time_me
-def success_prob_int(string):
+@time_me
+def sprob(string):
     """
     Given a string of dice to roll, return the probability of a successful result on that check using integers.
     """
@@ -249,15 +170,15 @@ def success_prob_int(string):
     # Calculate % of pools which are successful and return a rounded percentage
     prob = success/len(p_pools)
     return round(100*prob, 2)
+	
 
-
-def s(string):
-    return str(success_prob_int(string)) + "%"
-    
+# UI loop for when running file
 while True:
-	inp = str(input("String to roll? > "))
-	if inp == "quit" or inp == "q":
+	inp = input("String to roll? > ").split()
+	if inp[0] == "quit" or inp[0] == "q":
 		break
-	else:
-		print(s(inp))
+	elif inp[0] == "prob":
+		print(str(sprob(inp[1])) + "%")
+	elif inp[0] == "roll":
+		print(describe(roll(inp[1])))
 
