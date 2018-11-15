@@ -29,21 +29,25 @@ BEFORE v0.2:
 /Properly comment rpg.py
 
 BEFORE v0.3:
-Clean input loop in rpg.py
-Clean repetitive code in Adventure.__init__()
-Bugfix v0.2
+/Clean input loop in rpg.py
+/Clean repetitive code in Adventure.__init__()
+/Bugfix v0.2
 Characteristic generators for dnd and gsys, implementation of chartype
-D&D roll statistics tools in dnd.py (mostly for adv/disadv)
+D&D roll statistics tools in dnd.py (-> mobile)
 Skill generators for dnd and gsys
 Complete fantasy name generator files (-> mobile?)
-Create dnd.py for dnd-specific tools
+/Create dnd.py for dnd-specific tools
 import dnd, gsys in rpg.py
 Generalize gsys.py for genesys-specific tools (and ofc merge in gsys.py from mobile branch)
+Make charLoop() and other inputs in rpg.py take more helpful commands
+Properly comment dnd.py and rpg.py loops
+Use random.sample to improve code in Adventure
 
 BEFORE v0.4:
 Proper skill/characteristic management; roll appropriate dice/mods for a character given skill check
 Generate HP/etc. and derived attributes for gsys and dnd
 Age/appearance/quirks for characters
+Implement prior command memory in rpg.py mainLoop()
 
 BEFORE v1:
 Inventory/items, profession/class for npcs/pcs, proper handling of class/archetype/whatever

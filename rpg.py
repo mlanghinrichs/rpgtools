@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, randint
 import json, os
 
 # Import json name, adventure data into dicts before doing anything else
@@ -6,20 +6,21 @@ ndata = {}
 with open("tbls/names.json", "r") as f:
     ndata = json.load(f)
 
-advdata = {}
+adv_data = {}
 with open("tbls/adv.json", "r") as f:
-    advdata = json.load(f)
+    adv_data = json.load(f)
 
 
-def tbl_json(dic, arg_tuple):
+def tbl_json(dict_, *args):
+    # TODO make me make more sense & pass a list instead of a tuple by default
     """Takes a set of keys in a tuple and returns (list, listtype) tuple from ndata."""
     """e.g., ('foo', 'bar') as argument would return (ndata['foo']['bar'], 'list') if it
     found an array and (ndata['foo']['bar'], 'generator') if it found a string. Passed as
     tuple and not raw args to make passing the input through multiple funcs easier."""
-    current = dic # working dict starts as dic
+    current = dict_ # working dict starts as dict_
     
     try:
-        for arg in arg_tuple: # for each path in the tuple,
+        for arg in args: # for each path in the tuple,
             if isinstance(current[arg], dict): # if it finds a dict, go a level deeper
                 current = current[arg]
             elif isinstance(current[arg], str): # if it finds a string, return the split list and a generator marker
@@ -29,12 +30,13 @@ def tbl_json(dic, arg_tuple):
             else: # if it finds none of these, throw an error
                 raise IndexError('tbl_json called on sequence not ending in a string.')
     except KeyError:
-        print(f"Tried to pull a nonexistent generator {arg_tuple} with tbl_json! Returning ''")
+        print(f"Tried to pull a nonexistent generator {args} with tbl_json! Returning ''")
         return ([''], 'list')
 
 
-def jchoice(dic, tup):
-    return choice(tbl_json(dic,tup)[0])
+def jchoice(dict_, *args):
+    # TODO make me less dumb (by making tbl_json less dumb)
+    return choice(tbl_json(dict_, *args)[0])
 
 
 def ngen_l(list_):
@@ -55,9 +57,9 @@ def ngen_l(list_):
         return out.upper()
 
 
-def ngen_j(arg_tuple):
+def ngen_j(*args):
     """Takes a set of keys in a tuple and returns a generated name from ndata."""
-    inp = tbl_json(ndata, arg_tuple)
+    inp = tbl_json(ndata, *args)
 
     # Proper list vs generator behavior - generate from generator, pick from list
     if inp[1] == "generator":
@@ -65,15 +67,15 @@ def ngen_j(arg_tuple):
     elif inp[1] == "list":
         return choice(inp[0])
     else:
-        raise TypeError('Bad/lacking tuple passes to ngen_j!')
+        raise TypeError('Bad/lacking tuple passed to ngen_j!')
 
 
 class Character:
     """A class for RPG characters. Can generate PCs or NPCs with names &c."""
 
     # Initialize with any number of customized kwargs including skills, inventory, or stats.
-    def __init__(self, *, setting="fantasy", race="human", gender="male", system="dnd",
-                    chartype="npc", prof="fighter", namesource=None, skills={}, inv={}, stats={}):
+    def __init__(self, setting="fantasy", race="human", gender="male", *, system="dnd",
+                    chartype="npc", prof="fighter", skills={}, inv={}, stats={}):
 
         # Import each named var above as a local var for the instance
         self.__dict__.update((k, v) for k,v in vars().items() if k != 'self')
@@ -81,12 +83,15 @@ class Character:
         # Generate name and surname from value provided
         # self.name = ngen_fkeys("tbls/names/", setting, race, gender)
         # self.surname = ngen_fkeys("tbls/names/", setting, race, "surnames")
-        if not namesource:
-            self.name = ngen_j((setting, race, gender))
-            self.surname = ngen_j((setting, race, "surnames"))
-        else:
-            self.name = ngen_j((namesource, race, gender))
-            self.surname = ngen_j((namesource, race, "surnames"))
+        self.name = ngen_j(setting, race, gender)
+        self.surname = ngen_j(setting, race, "surnames")
+
+        self.age = randint(18,80)
+
+    def desc(self):
+        out = "Name: " + self.name + " " + self.surname
+        out += "\nAge: " + str(self.age)
+        return out
 
 
 class Adventure:
@@ -94,16 +99,16 @@ class Adventure:
 
     def __init__(self, advtype, *, num_elements=3, **kwargs):
         # Temp variables to increase legibility
-        d = advdata
+        d = adv_data
         t = advtype
         
         # Set all adventure variables
-        self.locale = jchoice(d, (t, 'locales'))
-        self.sub_locale = jchoice(d, (t, 'sub_locales'))
-        self.plot = jchoice(d, (t, 'plots')) 
-        self.objective = jchoice(d, (t, 'objectives'))
-        self.hours = [jchoice(d, (t, 'hours')) for x in range(3)]
-        self.story_elements = [jchoice(d, (t, 'story_elements')) for x in range(num_elements)]
+        self.locale = jchoice(d, t, 'locales')
+        self.sub_locale = jchoice(d, t, 'sub_locales')
+        self.plot = jchoice(d, t, 'plots') 
+        self.objective = jchoice(d, t, 'objectives')
+        self.hours = [jchoice(d, t, 'hours') for x in range(3)]
+        self.story_elements = [jchoice(d, t, 'story_elements') for x in range(num_elements)]
 
         # If user manually entered any details, overwrite the generated ones
         self.__dict__.update((k, v) for k,v in vars().items() if k in ['locale',
@@ -145,24 +150,34 @@ Random elements:"""
             print("Wrote to " + path)
 
 
-x = Adventure("goh")
-print("\n", x.desc(), "\n")
+def mainLoop():
+    """Primary input loop for when you run the program."""
+
+    print("Welcome to rpgtools v0.2.\nEnter a command or type 'help' for more options.")
+    while True:
+        inp = input(" > ").split()
+
+        if inp[0] == 'help':
+            print("- char(acter): opens character generator")
+            print("- adv(enture): opens adventure generator")
+            print("- q(uit): quits program")
+        elif inp[0] == "char" or inp[0] == "character":
+            char = Character(*inp[1:]) # Pass args after 'char'/'character' to Character
+            print(char.desc())
+            # if charLoop():
+            #     break
+        elif inp[0] == "adv" or inp[0] == "adventure":
+            advtype = input("What kind of adventure?")
+            new = Adventure(advtype)
+            print(new.desc())
+        elif inp[0] == "q" or inp[0] == "quit":
+            break
 
 
-# Main input loop - asks what you want to generate, then (currently) prints name(s) and surname(s)
-while True:
-    print("Welcome to rpgtools charGen v0.1a. Specify any kwargs you would like to alter below.")
-    print("Input 'n' or 'none' to generate character(s). Input 'q' or 'quit' to end program prematurely.")
+def charLoop():
 
-    print("""
-            Available options:
-            setting
-            race
-            gender
-            system
-            char(acter)type
-            prof(ession)
-            """)
+    print(" - Input 'n' or 'none' to generate character(s). Input 'q' or 'quit' to end program prematurely.\n -")
+    print(" - Available options:\n - setting\n - race\n - gender\n - system\n - char(acter)type\n - prof(ession)\n - namesource\n -")
 
     # key in main scope so it can be checked in main loop if 'q'/'quit' in subloop
     key = ''
@@ -170,26 +185,71 @@ while True:
 
     # Subloop asks for key, then value. Completes on n/none and quits program on q/quit
     while True:
-        key = input("Key to alter: ")
+        key = input(" - Key to alter: ")
         if key == 'q' or key == 'quit' or key == 'n' or key == 'none':
             break # Subloop break condition (on n/none or q/quit)
         else:
-            value = input("Value to set: ")
+            value = input(" - Value to set: ")
             inpDict[key] = value
-            print("")
+            print(" - ")
 
     # Main loop break condition (on q/quit; continue on n/none)
     if key == 'q' or key == 'quit':
-        break
+        return True
 
     # How many characters to make?
-    num = int(input("Number to generate? "))
+    num = int(input(" - Number to generate? "))
 
     # Make that many and print their names, using data from inp(ut)Dict
     for i in range(num):
         temp = Character(**inpDict)
-        print(temp.name + " " + temp.surname)
-    
-    # Currently, this isn't much of a loop - TODO make it repeatable
-    break
+        print(" -> \n" + temp.desc())
 
+
+mainLoop()
+
+
+# Main input loop - asks what you want to generate, then (currently) prints name(s) and surname(s)
+# while True:
+#     print("Welcome to rpgtools charGen v0.1a. Specify any kwargs you would like to alter below.")
+#     print("Input 'n' or 'none' to generate character(s). Input 'q' or 'quit' to end program prematurely.")
+# 
+#     print("""
+#             Available options:
+#             setting
+#             race
+#             gender
+#             system
+#             char(acter)type
+#             prof(ession)
+#             """)
+# 
+#     # key in main scope so it can be checked in main loop if 'q'/'quit' in subloop
+#     key = ''
+#     inpDict = {} # hold key/values to change in a dict so they can be passed to Character()
+# 
+#     # Subloop asks for key, then value. Completes on n/none and quits program on q/quit
+#     while True:
+#         key = input("Key to alter: ")
+#         if key == 'q' or key == 'quit' or key == 'n' or key == 'none':
+#             break # Subloop break condition (on n/none or q/quit)
+#         else:
+#             value = input("Value to set: ")
+#             inpDict[key] = value
+#             print("")
+# 
+#     # Main loop break condition (on q/quit; continue on n/none)
+#     if key == 'q' or key == 'quit':
+#         break
+# 
+#     # How many characters to make?
+#     num = int(input("Number to generate? "))
+# 
+#     # Make that many and print their names, using data from inp(ut)Dict
+#     for i in range(num):
+#         temp = Character(**inpDict)
+#         print(temp.name + " " + temp.surname)
+#     
+#     # Currently, this isn't much of a loop - TODO make it repeatable
+#     break
+# 

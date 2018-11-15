@@ -26,9 +26,9 @@
     {
         "human":
         {
-            "male": "w,c,g,s,p,b;a,e,ui,y,u;x,ph,ll,d,tt,r;i,a,ia,ou;l,ll,nd,m;ium,ius,os,e",
+            "male": "w,c,g,s,p,b,h;a,e,ui,y,u;x,ph,ll,d,tt,r,w;i,a,ia,ou,y,o;l,ll,nd,m,r,rd,wth,rn;ium,ius,os,e,,,,",
             "female": ["Cassandra","Evelyn","Prouessa","Delphine","Olivia","Penance","Stellana","MaryEllis","Crimenzia"],
-            "surnames": "whitte,south,le,chiffen,mere,broad,crane;man,more,brook,ville,den,burrow,stable,,"
+            "surnames": "whitte,south,le,chiffen,mere,broad,crane,pur,wend,red,pool,wex,nord,still;man,more,brook,ville,den,burrow,stable,end,bend,pond,lowe,land,strom,"
         }
     },
     "modern": ""
