@@ -5,13 +5,15 @@
         {
             "male": "hr,k,br,d,t,s,h,c,m,n,;olf,al,ol,om,ad,ar,eg,ad,as,els,ich,ek,a;ed,as,in,e,ver,ol,t,id,,,;in,ar,ius,iel,as,or,,,,,,",
             "female": "gw,br,d,t,s,h,c,m,n,;at,ol,um,ad,ig,ad,as,els,ich,em;ei,ae,inn,e,va,la,te,idd,ra,;i,el,ia,iel,,,,,",
-            "surnames": ["Alder","Ash","Ashe","Atkinson","Atwood","Ayers","Barnes","Battle","Becker","Berry","Briar","Briggs","Brock","Brook","Brooke","Brooks","Bundy","Burnside","Burroughs","Burrows","Bush","Butler","Clay","Court","Cox","Croft","Cross","Crump","Dale","Dean","Deane","Dike","Dodd","Ford","Forrest","Fox","Freeman","Garside","Gary","Gorsuch","Graves","Green","Greene","Greeves","Gross","Grove","Grover","Hall","Hawthorne","Hazel","Head","Heather","Hill","Holland","Holley","Holly","Holmes","Holt","Homer","Hooke","Hope","House","Howe","Hume","Hyde","Johnston","Kay","Kaye","Keats","Kerry","Kirk","Kirke","Knight","Lamb","Land","Lane","Layne","Lea","Lee","Leigh","Lowell","Malthus","March","Marsh","Marshal","Marshall","Martin","May","Millerchip","Mills","Moore","Newby","Pain","Paine","Payne","Pike","Pitt","Preacher","Provost","Purple","Ridge","Rock","Rose","Roth","Rowen","Seller","Sellers","Shaw","Shore","Thorn","Thorne","Underwood","Wells","West","Whitney","Wild","Wilde","Wood","Woodrow","Woods"]
+            "surnames": ["Alder","Ash","Ashe","Atkinson","Atwood","Ayers","Barnes","Battle","Becker","Berry","Briar","Briggs","Brock","Brook","Brooke","Brooks","Bundy","Burnside","Burroughs","Burrows","Bush","Butler","Clay","Court","Cox","Croft","Cross","Crump","Dale","Dean","Deane","Dike","Dodd","Ford","Forrest","Fox","Freeman","Garside","Gary","Gorsuch","Graves","Green","Greene","Greeves","Gross","Grove","Grover","Hall","Hawthorne","Hazel","Head","Heather","Hill","Holland","Holley","Holly","Holmes","Holt","Homer","Hooke","Hope","House","Howe","Hume","Hyde","Johnston","Kay","Kaye","Keats","Kerry","Kirk","Kirke","Knight","Lamb","Land","Lane","Layne","Lea","Lee","Leigh","Lowell","Malthus","March","Marsh","Marshal","Marshall","Martin","May","Millerchip","Mills","Moore","Newby","Pain","Paine","Payne","Pike","Pitt","Preacher","Provost","Purple","Ridge","Rock","Rose","Roth","Rowen","Seller","Sellers","Shaw","Shore","Thorn","Thorne","Underwood","Wells","West","Whitney","Wild","Wilde","Wood","Woodrow","Woods"],
+            "agerange": [16, 60]
         },
         "dwarf":
         {
             "male": "t,y,d,g,h,hr,k,b,;aa,i,o,u,uu;l,m,n,r,,;gar,zan,veld,geld;sen,,,,",
             "female": "",
-            "surnames": "rock,horn,foe,gold,iron,gem,glow,ore,mead,axe,storm;hammer,eater,seeker,heart,born,render,smith,shaper,sworn,blessed"
+            "surnames": "rock,horn,foe,gold,iron,gem,glow,ore,mead,axe,storm;hammer,eater,seeker,heart,born,render,smith,shaper,sworn,blessed",
+            "agerange": [50, 350]
         },
         "halfling":
         {
@@ -20,7 +22,12 @@
         "halforc":
         {
             "male": "d,m,n,b,p,gr,j;ex,olc,art,oarn,arl,arce,egg;onax,kodd,,,,,,,,,,"
-        }
+        },
+        "quirk": ["visible physical scar", "magical scar", "raspy voice", "looks young for age", "looks old for age", "odd trinket", "unusually-colored hair", "minor magical talent", "noble above their station", "cursed", "con artist in over their head", "neurotic fear", "has a pet", "muscled"],
+        "strength": ["adaptable", "analytical", "courageous", "curious", "idealistic", "independent", "patient", "spiritual", "wise", "witty"],
+        "flaw": ["anger", "compulsion", "deception", "greed", "ignorance", "intolerance", "laziness", "pride", "recklessness", "timid"],
+        "desire": ["ambition", "belonging", "expertise", "fame", "justice", "knowledge", "love", "safety", "vengeance", "wealth"],
+        "fear": ["change", "commitment", "death", "expression", "failure", "humiliation", "isolation", "nemesis", "obscurity", "poverty"]
     },
     "steampunk":
     {
@@ -28,7 +35,8 @@
         {
             "male": "w,c,g,s,p,b,h;a,e,ui,y,u;x,ph,ll,d,tt,r,w;i,a,ia,ou,y,o;l,ll,nd,m,r,rd,wth,rn;ium,ius,os,e,,,,",
             "female": ["Cassandra","Evelyn","Prouessa","Delphine","Olivia","Penance","Stellana","MaryEllis","Crimenzia"],
-            "surnames": "whitte,south,le,chiffen,mere,broad,crane,pur,wend,red,pool,wex,nord,still;man,more,brook,ville,den,burrow,stable,end,bend,pond,lowe,land,strom,"
+            "surnames": "whitte,south,le,chiffen,mere,broad,crane,pur,wend,red,pool,wex,nord,still;man,more,brook,ville,den,burrow,stable,end,bend,pond,lowe,land,strom,",
+            "agerange": [18, 80]
         }
     },
     "modern": ""
