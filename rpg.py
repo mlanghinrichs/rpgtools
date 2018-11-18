@@ -3,7 +3,7 @@ import json, os
 
 # Import json name, adventure data into dicts before doing anything else
 def load_dict(filename):
-    with open("tbls/" + filename, "r") as f:
+    with open("./tbls/" + filename, "r") as f:
         return json.load(f)
 
 char_dict = load_dict("char.json")
@@ -89,7 +89,8 @@ class Character:
 
     def desc(self):
         rstr = "Name: " + self.name + " " + self.surname
-        rstr += "\nAge: " + str(self.age)
+        rstr += "\nAge/Gender: " + str(self.age) + "/" + self.gender
+        rstr += "\nRace: " + self.race
         for feature in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
             title = feature[0].upper() + feature[1:]
             rstr += f"\n{title}: {self.__dict__[feature]}"
@@ -101,11 +102,20 @@ class Character:
             out.append(h1 + h2)
         return "\n".join(out)
 
+    @classmethod
+    def random(cls, setting):
+        # TODO clean & comment races filter
+        races = filter(lambda x: 'agerange' in char_dict[setting][x],
+                            list(char_dict[setting].keys()))
+        race = choice(list(races))
+        gender = choice(('male', 'female'))
+        return Character(setting, race, gender)
+
 
 class Adventure:
     """A class of Adventure objects, containing data/functions for a session."""
 
-    def __init__(self, adv_type, *, num_hours=3, num_elements=3, **kwargs):
+    def __init__(self, adv_type, *, num_hours=3, num_elements=5, **kwargs):
         # Temp variables to increase legibility
         d = adv_dict
         t = adv_type
@@ -116,32 +126,29 @@ class Adventure:
         self.plot = extract_choice(d, t, 'plots') 
         self.objective = extract_choice(d, t, 'objectives')
         self.hours = sample(extract(d, t, 'hours'), num_hours)
-        self.story_elements = sample(extract(d, t, 'story_elements'), num_elements)
+        self.story_atoms = []
+        # TODO - make story_atoms assignment less nested
+        for i in range(num_elements):
+            self.story_atoms.append(sample(extract(d, t, 'story_elements'), num_elements))
+        self.quest_giver = Character.random('fantasy')
 
         # If user manually entered any details, overwrite the generated ones
         self.__dict__.update((k, v) for k,v in vars().items() if k in ['locale',
             'sub_locale', 'plot', 'objective', 'hours', 'story_elements', 'num_elements'])
 
         # Finally, set a title for the adventure
-        self.title = "THE " + self.story_elements[0].upper() + " OF " + self.locale.upper()
+        self.title = "THE " + extract_choice(d, t, 'title_elements').upper() + " OF " + self.locale.upper()
         
     
     def desc(self):
         """Return a formatted str containing the adventure details written out."""
 
-        out = f"""{self.title}
-In {self.locale}, in {self.sub_locale};
-A {self.plot}, to {self.objective}.
-
-In hour 1, {self.hours[0]}.
-In hour 2, {self.hours[1]}.
-In hour 3, {self.hours[2]}.
-   
-Random elements:"""
-
-        # Generalizable to any # of elements
-        for n in range(len(self.story_elements)):
-            out += "\n{}. {}".format(n+1, self.story_elements[n])
+        out = f"\n{self.title}\nIn {self.locale}, in {self.sub_locale};\nA {self.plot}, to {self.objective}."
+        out += f"\n\nGiven by:\n{self.quest_giver.desc()}\n"
+        for i in range(len(self.hours)):
+            out += f"\nIn hour {i+1}, {self.hours[i]}:"
+            for j in range(self.num_elements):
+                out += f"\n    {j+1}. {self.story_atoms[i][j]}"
 
         # Return the description string
         return out
@@ -164,100 +171,24 @@ def mainLoop():
     print("Welcome to rpgtools v0.2.\nEnter a command or type 'help' for more options.")
     while True:
         inp = input(" > ").split()
-
         if inp[0] == 'help':
-            print("- char(acter): opens character generator")
-            print("- adv(enture): opens adventure generator")
-            print("- q(uit): quits program")
+            print("- char(acter) [setting] [race] [gender] | random : describe a character")
+            print("- adv(enture) [source] : describe an adventure")
+            print("- q(uit): quit program")
         elif inp[0] == "char" or inp[0] == "character":
-            char = Character(*inp[1:]) ## Pass args after 'char'/'character' to Character
+            if inp[1] == "random":
+                char = Character.random('fantasy')
+            else:
+                char = Character(*inp[1:]) ## Pass args after 'char'/'character' to Character
             print(char.desc())
-            # if charLoop():
-            #     break
         elif inp[0] == "adv" or inp[0] == "adventure":
-            advtype = input("What kind of adventure? > ")
-            new = Adventure(advtype)
+            new = Adventure(inp[1])
             print(new.desc())
         elif inp[0] == "q" or inp[0] == "quit":
             break
-
-
-# def charLoop():
-# 
-#     print(" - Input 'n' or 'none' to generate character(s). Input 'q' or 'quit' to end program prematurely.\n -")
-#     print(" - Available options:\n - setting\n - race\n - gender\n - system\n - char(acter)type\n - prof(ession)\n - namesource\n -")
-# 
-#     # key in main scope so it can be checked in main loop if 'q'/'quit' in subloop
-#     key = ''
-#     inpDict = {} # hold key/values to change in a dict so they can be passed to Character()
-# 
-#     # Subloop asks for key, then value. Completes on n/none and quits program on q/quit
-#     while True:
-#         key = input(" - Key to alter: ")
-#         if key == 'q' or key == 'quit' or key == 'n' or key == 'none':
-#             break # Subloop break condition (on n/none or q/quit)
-#         else:
-#             value = input(" - Value to set: ")
-#             inpDict[key] = value
-#             print(" - ")
-# 
-#     # Main loop break condition (on q/quit; continue on n/none)
-#     if key == 'q' or key == 'quit':
-#         return True
-# 
-#     # How many characters to make?
-#     num = int(input(" - Number to generate? "))
-# 
-#     # Make that many and print their names, using data from inp(ut)Dict
-#     for i in range(num):
-#         temp = Character(**inpDict)
-#         print(" -> \n" + temp.desc())
+        else:
+            print(f" x {inp[0]} is not a supported command.")
 
 
 mainLoop()
 
-
-# Main input loop - asks what you want to generate, then (currently) prints name(s) and surname(s)
-# while True:
-#     print("Welcome to rpgtools charGen v0.1a. Specify any kwargs you would like to alter below.")
-#     print("Input 'n' or 'none' to generate character(s). Input 'q' or 'quit' to end program prematurely.")
-# 
-#     print("""
-#             Available options:
-#             setting
-#             race
-#             gender
-#             system
-#             char(acter)type
-#             prof(ession)
-#             """)
-# 
-#     # key in main scope so it can be checked in main loop if 'q'/'quit' in subloop
-#     key = ''
-#     inpDict = {} # hold key/values to change in a dict so they can be passed to Character()
-# 
-#     # Subloop asks for key, then value. Completes on n/none and quits program on q/quit
-#     while True:
-#         key = input("Key to alter: ")
-#         if key == 'q' or key == 'quit' or key == 'n' or key == 'none':
-#             break # Subloop break condition (on n/none or q/quit)
-#         else:
-#             value = input("Value to set: ")
-#             inpDict[key] = value
-#             print("")
-# 
-#     # Main loop break condition (on q/quit; continue on n/none)
-#     if key == 'q' or key == 'quit':
-#         break
-# 
-#     # How many characters to make?
-#     num = int(input("Number to generate? "))
-# 
-#     # Make that many and print their names, using data from inp(ut)Dict
-#     for i in range(num):
-#         temp = Character(**inpDict)
-#         print(temp.name + " " + temp.surname)
-#     
-#     # Currently, this isn't much of a loop - TODO make it repeatable
-#     break
-# 
