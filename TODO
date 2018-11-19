@@ -1,0 +1,45 @@
+class Character(*args, **kwargs):
+    -> Age
+    Appearance
+    Quirks
+    /System?:
+    /-> NPC Type?
+    --> Characteristics
+        dnd: [randint(1,6) for i in range(4)]; list.remove(min(list))
+        gsys>minion: shuffle([1, 1, 1, 2, 2, 2])
+        gsys>rival: shuffle([1, 2, 2, 2, 3, 3])
+        gsys>nemesis: shuffle([2, 2, 3, 3, 3, 3])
+    /--> Skills
+    --> Items
+    if NPC:
+    --> Profession
+    --> Low HP
+    --> Levels, if any
+    if PC:
+    --> Class
+    --> Proper stats
+
+BEFORE v0.2:
+Eliminate .raw in goh.py
+Bring goh.py into rpg.py and generalize adventure generation
+/Make optional namesource var in Character class to act as alternative to setting/race for name source
+/Move generator files into one file or into nested folders; change code to reflect that - moved to json & changed code
+Convert goh's generator to use .json as well (should be easy once it's in rpg.py)
+Remove deprecated txt-file-generator-based code from rpg.py
+
+BEFORE v0.3:
+Characteristic generators for dnd and gsys, implementation of chartype
+D&D roll statistics tools in dnd.py (mostly for adv/disadv)
+Skill generators for dnd and gsys
+Complete fantasy name generator files (-> mobile?)
+Create dnd.py for dnd-specific tools
+import dnd, gsys in rpg.py
+Generalize gsys.py for genesys-specific tools (and ofc merge in gsys.py from mobile branch)
+
+BEFORE v0.4:
+Proper skill/characteristic management; roll appropriate dice/mods for a character given skill check
+Generate HP/etc. and derived attributes for gsys and dnd
+Age/appearance/quirks for characters
+
+BEFORE v1:
+Inventory/items, profession/class for npcs/pcs, proper handling of class/archetype/whatever
