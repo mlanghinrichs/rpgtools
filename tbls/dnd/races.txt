@@ -1,10 +1,10 @@
 Dragonborn
-Dwarf
+/Dwarf
 Elf
 Gnome
 Half-Elf
-Halfling
-Half-Orc
-Human
+/Halfling
+/Half-Orc
+/Human
 Tiefling
 

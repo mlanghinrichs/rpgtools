@@ -41,11 +41,13 @@ def ngen_l(list_):
     
     out = ""
 
-    for string in list_: ## For each line of the generator file,
-        out += choice(string.split(",")) ## Append one of the options on that line to out
+    # For each line of the generator file, append one of the options on that line to out
+    for string in list_:
+        out += choice(string.split(","))
     
     # TODO - make this if/else to avoid sneaky bugs?
-    try: ## Try to capitalize out properly; if it's < 2 chars, skip this to avoid error 
+    # Try to capitalize out properly; if it's < 2 chars, skip this to avoid error 
+    try: 
         return out[0].upper() + out[1:].lower()
     except IndexError:
         return out.upper()
@@ -68,26 +70,24 @@ class Character:
     """A class for RPG characters. Can generate PCs or NPCs with names &c."""
 
     # Initialize with any number of customized kwargs including skills, inventory, or stats.
-    def __init__(self, setting="fantasy", race="human", gender="male", *, system="dnd",
+    def __init__(self, setting="fantasy", race="human", gender="female", *, system="dnd",
                     chartype="npc", prof="fighter", skills={}, inv={}, stats={}):
 
         # Import each named var above as a local var for the instance
         self.__dict__.update((k, v) for k,v in vars().items() if k != 'self')
 
         # Generate name and surname from value provided
-        ## self.name = ngen_fkeys("tbls/names/", setting, race, gender)
-        ## self.surname = ngen_fkeys("tbls/names/", setting, race, "surnames")
         self.name = ngen_j(setting, race, gender)
         self.surname = ngen_j(setting, race, 'surnames')
 
-        # Get agerange list (should be two items) from char_dict
+        # Get agerange list (should be two items) from char_dict - TODO add exception handling
         self.age = randint(*extract(char_dict, setting, race, 'agerange'))
 
         # Get features
         for feature in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
             self.__dict__[feature] = extract_choice(char_dict, setting, feature)
 
-    def desc(self):
+    def __str__(self):
         rstr = "Name: " + self.name + " " + self.surname
         rstr += "\nAge/Gender: " + str(self.age) + "/" + self.gender
         rstr += "\nRace: " + self.race
@@ -103,7 +103,7 @@ class Character:
         return "\n".join(out)
 
     @classmethod
-    def random(cls, setting):
+    def random(cls, setting="fantasy"):
         # TODO clean & comment races filter
         races = filter(lambda x: 'agerange' in char_dict[setting][x],
                             list(char_dict[setting].keys()))
@@ -113,7 +113,7 @@ class Character:
 
 
 class Adventure:
-    """A class of Adventure objects, containing data/functions for a session."""
+    """Adventure objects, containing randomly generated data for running a session."""
 
     def __init__(self, adv_type, *, num_hours=3, num_elements=5, **kwargs):
         # Temp variables to increase legibility
@@ -126,11 +126,16 @@ class Adventure:
         self.plot = extract_choice(d, t, 'plots') 
         self.objective = extract_choice(d, t, 'objectives')
         self.hours = sample(extract(d, t, 'hours'), num_hours)
-        self.story_atoms = []
-        # TODO - make story_atoms assignment less nested
-        for i in range(num_elements):
-            self.story_atoms.append(sample(extract(d, t, 'story_elements'), num_elements))
         self.quest_giver = Character.random('fantasy')
+        
+        # Make temp story_elements list so we don't have to open and close it for each # in num_elements
+        story_elements = extract(d, t, 'story_elements') 
+        # A list of lists to contain x hours worth of atoms
+        self.story_atoms = []
+        for i in range(num_elements):
+            # Pick 5 story elements and add them in a list to story_atoms
+            elems = sample(story_elements, num_elements)
+            self.story_atoms.append(elems)
 
         # If user manually entered any details, overwrite the generated ones
         self.__dict__.update((k, v) for k,v in vars().items() if k in ['locale',
@@ -140,54 +145,56 @@ class Adventure:
         self.title = "THE " + extract_choice(d, t, 'title_elements').upper() + " OF " + self.locale.upper()
         
     
-    def desc(self):
-        """Return a formatted str containing the adventure details written out."""
-
+    def __str__(self):
         out = f"\n{self.title}\nIn {self.locale}, in {self.sub_locale};\nA {self.plot}, to {self.objective}."
-        out += f"\n\nGiven by:\n{self.quest_giver.desc()}\n"
+        out += f"\n\nGiven by:\n{self.quest_giver}\n"
+        # Nested "In hour x, [stuff]: y random elements"
         for i in range(len(self.hours)):
             out += f"\nIn hour {i+1}, {self.hours[i]}:"
             for j in range(self.num_elements):
                 out += f"\n    {j+1}. {self.story_atoms[i][j]}"
-
-        # Return the description string
         return out
 
     def write(self, direc):
         """Write adventure details to a txt file in ./direc/ named after the title."""
         
-        # Str containing path to save file to
+        # craft a string with the full save-to path & filename
         path = direc + "/" + self.title.replace(" ", "") + ".txt"
-        path = path.lower() ## fix dramatic title capitalization
-        if not os.path.isfile(path): ## make sure the filename doesn't exist yet
+        # fix dramatic title capitalization
+        path = path.lower() 
+        # make sure the filename doesn't exist yet
+        if not os.path.isfile(path): 
             with open(path, "w") as f:
-                f.write(self.desc())
+                f.write(str(self))
             print("Wrote to " + path)
 
 
 def mainLoop():
-    """Primary input loop for when you run the program."""
+    """Primary input loop for running rpg.py as a program."""
 
     print("Welcome to rpgtools v0.2.\nEnter a command or type 'help' for more options.")
     while True:
         inp = input(" > ").split()
-        if inp[0] == 'help':
-            print("- char(acter) [setting] [race] [gender] | random : describe a character")
-            print("- adv(enture) [source] : describe an adventure")
-            print("- q(uit): quit program")
-        elif inp[0] == "char" or inp[0] == "character":
-            if inp[1] == "random":
-                char = Character.random('fantasy')
+        try:
+            if inp[0] == 'help':
+                print("- char(acter) [setting] [race] [gender] | random : describe a character")
+                print("- adv(enture) [source] : describe an adventure")
+                print("- q(uit): quit program")
+            elif inp[0] == "char" or inp[0] == "character":
+                if inp[1] == "random":
+                    char = Character.random('fantasy')
+                else:
+                    char = Character(*inp[1:]) ## Pass args after 'char'/'character' to Character
+                print(char)
+            elif inp[0] == "adv" or inp[0] == "adventure":
+                new = Adventure(inp[1])
+                print(new)
+            elif inp[0] == "q" or inp[0] == "quit":
+                break
             else:
-                char = Character(*inp[1:]) ## Pass args after 'char'/'character' to Character
-            print(char.desc())
-        elif inp[0] == "adv" or inp[0] == "adventure":
-            new = Adventure(inp[1])
-            print(new.desc())
-        elif inp[0] == "q" or inp[0] == "quit":
-            break
-        else:
-            print(f" x {inp[0]} is not a supported command.")
+                print(f" x {inp[0]} is not a supported command.")
+        except IndexError:
+            print(f"'{' '.join(inp)}' requires a command or more arguments.")
 
 
 mainLoop()
