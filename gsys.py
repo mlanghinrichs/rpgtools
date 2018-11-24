@@ -22,7 +22,7 @@ def std_inp(string):
     for tup in repls:
         string = string.replace(*tup)
 
-	# Filter bad letters
+    # Filter bad letters
     string = ''.join(c for c in string if c in 'pacdsb')
 
     # Return the fixed string
@@ -133,8 +133,8 @@ def sprob(string):
 
     # Confirm string length 0<x<9
     if not (len(string) > 0 and len(string) < 9):
-    	print('String is too short or too long! Length: {}'.format(len(string)))
-    	return
+        print('String is too short or too long! Length: {}'.format(len(string)))
+        return
 
     # Empty list of possible pools given string
     p_pools = []
@@ -170,15 +170,16 @@ def sprob(string):
     # Calculate % of pools which are successful and return a rounded percentage
     prob = success/len(p_pools)
     return round(100*prob, 2)
-	
+    
 
 # UI loop for when running file
-while True:
-	inp = input("String to roll? > ").split()
-	if inp[0] == "quit" or inp[0] == "q":
-		break
-	elif inp[0] == "prob":
-		print(str(sprob(inp[1])) + "%")
-	elif inp[0] == "roll":
-		print(describe(roll(inp[1])))
+if __name__ == "__main__":
+    while True:
+        inp = input("String to roll? > ").split()
+        if inp[0] == "quit" or inp[0] == "q":
+            break
+        elif inp[0] == "prob":
+            print(str(sprob(inp[1])) + "%")
+        elif inp[0] == "roll":
+            print(describe(roll(inp[1])))
 

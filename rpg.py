@@ -1,5 +1,5 @@
 from random import choice, randint, sample
-import json, os
+import json, os, gsys
 
 # Import json name, adventure data into dicts before doing anything else
 def load_dict(filename):
@@ -196,6 +196,6 @@ def mainLoop():
         except IndexError:
             print(f"'{' '.join(inp)}' requires a command or more arguments.")
 
-
-mainLoop()
+if __name__ == "__main__":
+    mainLoop()
 
