@@ -1,56 +1,96 @@
 from random import choice, randint, sample
 import math
 
-def roll(num=1, type=20, mod=0):
-	out = 0
-	for i in range(num):
-		out += randint(1,type)
-	return out + mod
-	
+class Roll():
 
-def readstr(string):
-	mod = 0
-	
-	ind = max(string.find('+'), string.find('-'))
-	if ind != -1:
-		mod = int(string[ind:])
-		string = string[:ind]
-	
-	spl = string.split('d')
-	num = int(spl[0])
-	type = int(spl[1])
-	
-	return (num, type, mod)
+    def __init__(self, num=1, die=20, mod=0, *args, **kwargs):
+        # Save num, die, and mod to object's dict
+        self.__dict__.update((k, v) for k,v in vars().items() if k in ("num", "die", "mod"))
+        out = 0
+        for i in range(num):
+            out += randint(1, die)
+        self.result = out + mod
+        if "result" in kwargs.keys():
+            self.result = kwargs['result']
+
+    def __str__(self):
+        return str(self.result)
+
+    def __lt__(self, other):
+        return self.result < other.result
+
+    def __gt__(self, other):
+        return self.result > other.result
+
+    def __int__(self):
+        return int(self.result)
+
+    def __add__(self, other):
+        return self.result + other
+
+    def __sub__(self, other):
+        return self.result - other
+
+    def __radd__(self, other):
+        return other + self.result
+
+    def __rsub__(self, other):
+        return other - self.result
 
 
-def sroll(string):
-	return roll(*readstr(string))
+    @classmethod
+    def string(cls, string):
+        mod = 0
+        # Check if + or - is in the string and log its location
+        ind = max(string.find('+'), string.find('-'))
+        # If it is in the string,
+        if ind != -1:
+            # set mod to everything after its position in the string
+            mod = int(string[ind:])
+            # and set the string to the preceding
+            string = string[:ind]
+        num, die = int(string.split('d')[0]), int(string.split('d')[1])
+        return cls(num, die, mod)
+
+    @classmethod
+    def advantage(cls, num=1, die=20, mod=0):
+        """Return the highest of two rolls."""
+        a, b = cls(num, die, mod), cls(num, die, mod)
+        return max(a, b)
+
+    @classmethod
+    def disadvantage(cls, num=1, die=20, mod=0):
+        """Return the lowest of two rolls."""
+        a, b = cls(num, die, mod), cls(num, die, mod)
+        return min(a, b)
+
+    @classmethod
+    def dropleast(cls, num=4, die=6, mod=0):
+        """Return a multi-die Roll with the lowest result among the dice dropped."""
+        # Make a list of individual die rolls
+        results = [randint(1, die) for roll in range(num)]
+        results.remove(min(results))
+        result = sum(results) + mod
+        # Return an object with a pre-set result
+        return cls(num=num, die=die, mod=mod, result=result)
 
 
-def dropleast(num, type, mod, times):
-	res = [roll(num, type, mod) for i in range(times)]
-	res.remove(min(res))
-	return sum(res)
+class Poly():
 
+    def __init__(self, args):
+        pass
 
-def d20(mod,adv=None):
-	if adv == 'advantage':
-		return max(roll(), roll()) + mod
-	elif adv == 'disadvantage':
-		return min(roll(), roll()) + mod
-	else:
-		return roll() + mod
-	
+class Char():
 
-def genStats():
-	stats = {}
-	mods = {}
-	for stat in ("str", "dex", "con", "int", "wis", "cha"):
-		stats[stat] = dropleast(1, 6, 0, 4)
-		mods[stat] =(stats[stat]-10)//2
-	return {'stats': stats, 'mods': mods}
-	
-
-print(readstr("1d4"))
-
+    def __init__(self, stats = {}):
+        self.stats = stats
+        if len(stats) == 0:
+            for stat in ("str", "dex", "con", "int", "wis", "cha"):
+                self.stats[stat] = int(Roll.dropleast())
+        self.mods = {}
+        for stat in self.stats.keys():
+            self.mods[stat] =(self.stats[stat]-10)//2
+if __name__ == "__main__":    
+    x = Char()
+    print(x.stats, x.mods)
 

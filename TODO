@@ -35,18 +35,19 @@ BEFORE v0.3:
 Characteristic generators for:
     /dnd and
     gsys
-D&D roll statistics tools in dnd.py (-> mobile)
-Skill generators for dnd and gsys
-Fill out name generator file more (-> mobile?)
+/D&D roll statistics tools in dnd.py (-> mobile)
+Skill generators for /dnd and gsys
+Fill out name generator file more
 /Create dnd.py for dnd-specific tools
-import dnd, gsys in rpg.py
+/import dnd, gsys in rpg.py
 Generalize gsys.py for genesys-specific tools (and ofc merge in gsys.py from mobile branch)
-Make charLoop() and other inputs in rpg.py take more helpful commands
+/Make charLoop() and other inputs in rpg.py take more helpful commands
 Properly comment dnd.py and rpg.py loops
 /Use random.sample to improve code in Adventure
 /fix tbls_json to behave in a more reasonable manner
 /Implement non-name detail generation for characters
-Fix README
+/Fix README
+Fix bug where repeated adventure generation in rpg.py yields quest-givers with identical dnd stats
 
 BEFORE v0.4:
 Proper skill/characteristic management; roll appropriate dice/mods for a character given skill check

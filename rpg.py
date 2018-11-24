@@ -1,5 +1,5 @@
 from random import choice, randint, sample
-import json, os, gsys
+import json, os, dnd, gsys
 
 # Import json name, adventure data into dicts before doing anything else
 def load_dict(filename):
@@ -87,6 +87,12 @@ class Character:
         for feature in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
             self.__dict__[feature] = extract_choice(char_dict, setting, feature)
 
+        if system == "dnd":
+            self._rawGen = dnd.Char()
+            self.stats = self._rawGen.stats
+            self.mods = self._rawGen.mods
+
+    # TODO comment this formatting mess
     def __str__(self):
         rstr = "Name: " + self.name + " " + self.surname
         rstr += "\nAge/Gender: " + str(self.age) + "/" + self.gender
@@ -94,6 +100,10 @@ class Character:
         for feature in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
             title = feature[0].upper() + feature[1:]
             rstr += f"\n{title}: {self.__dict__[feature]}"
+        if len(self.stats) != 0:
+            for (k, v) in self.stats.items():
+                rstr += f"\n{k}: {v}({self.mods[k]})"
+        # Split all output lines into a list so they can be uniformly formatted and then rejoined
         out = []
         for line in rstr.split("\n"):
             h1 = line.split()[0]
@@ -109,7 +119,7 @@ class Character:
                             list(char_dict[setting].keys()))
         race = choice(list(races))
         gender = choice(('male', 'female'))
-        return Character(setting, race, gender)
+        return cls(setting, race, gender)
 
 
 class Adventure:
