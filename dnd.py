@@ -3,13 +3,14 @@ import math
 
 class Roll():
 
-    def __init__(self, num=1, die=20, mod=0, *args, **kwargs):
+    def __init__(self, num=1, die=20, mod=0, dropleast=False, *args, **kwargs):
         # Save num, die, and mod to object's dict
         self.__dict__.update((k, v) for k,v in vars().items() if k in ("num", "die", "mod"))
-        out = 0
+        self.rolls = []
         for i in range(num):
-            out += randint(1, die)
-        self.result = out + mod
+            self.rolls.append(randint(1, die))
+        if dropleast: self.rolls.remove(min(self.rolls))
+        self.result = sum(self.rolls) + mod
         if "result" in kwargs.keys():
             self.result = kwargs['result']
 
@@ -67,12 +68,7 @@ class Roll():
     @classmethod
     def dropleast(cls, num=4, die=6, mod=0):
         """Return a multi-die Roll with the lowest result among the dice dropped."""
-        # Make a list of individual die rolls
-        results = [randint(1, die) for roll in range(num)]
-        results.remove(min(results))
-        result = sum(results) + mod
-        # Return an object with a pre-set result
-        return cls(num=num, die=die, mod=mod, result=result)
+        return cls(num, die, mod, dropleast=True)
 
 
 class Poly():
@@ -82,15 +78,12 @@ class Poly():
 
 class Char():
 
-    def __init__(self, stats = {}):
-        self.stats = stats
-        if len(stats) == 0:
-            for stat in ("str", "dex", "con", "int", "wis", "cha"):
-                self.stats[stat] = int(Roll.dropleast())
+    def __init__(self):
+        self.stats = {}
+        for stat in ("str", "dex", "con", "int", "wis", "cha"):
+            self.stats[stat] = int(Roll.dropleast())
         self.mods = {}
         for stat in self.stats.keys():
             self.mods[stat] =(self.stats[stat]-10)//2
-if __name__ == "__main__":    
-    x = Char()
-    print(x.stats, x.mods)
-
+if __name__ == "__main__":
+    pass
