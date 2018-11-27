@@ -1,0 +1,8 @@
+name (ljust 18)
+surname (ljust 18)
+prof (ljust 18)
+*[stat[1] for stat in stats.items()] (rjust 3)
+*[mod[1] for mod in mods.items()] (rjust 3)
+proficiency (rjust 4)
+initiative (rjust 4)
+*[skillmod[1] for skillmod in skillmods.items()] (ljust 4)

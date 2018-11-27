@@ -1,6 +1,27 @@
 from random import choice, randint, sample
 import math
 
+skill_list = { "Acrobatics": "dex",
+          "Animal Handling": "wis",
+          "Arcana": "int",
+          "Athletics": "str",
+          "Deception": "cha",
+          "History": "int",
+          "Insight": "wis",
+          "Intimidation": "cha",
+          "Investigation": "int",
+          "Medicine": "wis",
+          "Nature": "int",
+          "Perception": "wis",
+          "Performance": "cha",
+          "Persuasion": "cha",
+          "Religion": "int",
+          "Sleight of Hand": "dex",
+          "Stealth": "dex",
+          "Survival": "wis"
+          }
+
+
 class Roll():
 
     def __init__(self, num=1, die=20, mod=0, dropleast=False, *args, **kwargs):
@@ -76,7 +97,7 @@ class Poly():
     def __init__(self, args):
         pass
 
-class Char():
+class CharGen():
 
     def __init__(self):
         self.stats = {}
@@ -85,5 +106,11 @@ class Char():
         self.mods = {}
         for stat in self.stats.keys():
             self.mods[stat] =(self.stats[stat]-10)//2
+        self.skills = {}
+        for (s, c) in skill_list.items():
+            self.skills[s] = self.mods[c]
+
+
 if __name__ == "__main__":
-    pass
+    print("Please don't run me as a program. Try rpg.py instead!")
+

@@ -1,0 +1,31 @@
+_____________________________
+| Name:   {0}|
+|         {1}|
+| Class:  {2}|
+|---------------------------|
+| STR DEX CON | INT WIS CHA |
+| {3} {4} {5} | {6} {7} {8} |
+| {9} {10} {11} | {12} {13} {14} |
+|---------------------------|
+| PROF: {15}  | INIT: {16}  |
+|---------------------------|
+| Skills:                   |
+| Acrobatics:      {17}     |
+| Animal Handling: {18}     |
+| Arcana:          {19}     |
+| Athletics:       {20}     |
+| Deception:       {21}     |
+| History:         {22}     |
+| Insight:         {23}     |
+| Intimidation:    {24}     |
+| Investigation:   {25}     |
+| Medicine:        {26}     |
+| Nature:          {27}     |
+| Perception:      {28}     |
+| Performance:     {29}     |
+| Persuasion:      {30}     |
+| Religion:        {31}     |
+| Sleight of Hand: {32}     |
+| Stealth:         {33}     |
+| Survival:        {34}     |
+-----------------------------

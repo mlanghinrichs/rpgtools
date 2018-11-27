@@ -6,7 +6,7 @@ import gsys
 
 # Import json name, adventure data into dicts
 def load_dict(filename):
-    with open("./tbls/" + filename, "r") as f:
+    with open("./src/" + filename, "r") as f:
         return json.load(f)
 char_dict = load_dict("char.json")
 adv_dict = load_dict("adv.json")
@@ -72,7 +72,7 @@ class Character:
 
     # Initialize with any number of customized kwargs including skills, inventory, or stats.
     def __init__(self, setting="fantasy", race="human", gender="female", *,
-                    chartype="npc", prof="fighter", skills={}, inv={}):
+                    chartype="npc", prof="fighter", inv={}, rand=False):
 
         # Import each named var above as a local var for the instance
         self.__dict__.update((k, v) for k,v in vars().items() if k != 'self')
@@ -82,8 +82,8 @@ class Character:
         # Get agerange list (should be two items) from char_dict - TODO add exception handling
         self.age = randint(*extract(char_dict, setting, race, 'agerange'))
         # Get features
-        for feature in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
-            self.__dict__[feature] = extract_choice(char_dict, setting, feature)
+        for f in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
+            self.__dict__[f] = extract_choice(char_dict, setting, f)
 
     # TODO comment this formatting mess
     def __str__(self):
@@ -94,19 +94,26 @@ class Character:
     def random(cls, setting="fantasy"):
         # TODO clean & comment races filter
         races = filter(lambda x: 'agerange' in char_dict[setting][x],
-                            list(char_dict[setting].keys()))
+                       list(char_dict[setting].keys()))
         race = choice(list(races))
         gender = choice(('male', 'female'))
-        return cls(setting, race, gender)
+        return cls(setting, race, gender, rand=True)
 
 
 class DNDChar(Character):
 
-    def __init__(self, *args, level=0, **kwargs): 
-        self._rawGen = dnd.Char()
+    def __init__(self, *args, proficient_in=(), level=1, **kwargs): 
+        self._rawGen = dnd.CharGen()
         self.stats = self._rawGen.stats
         self.mods = self._rawGen.mods
         self.level = level
+        self.prof_mod = (level - 1)//4 + 2
+        self.skills = self._rawGen.skills
+        self.proficiencies = proficient_in
+        if 'rand' in kwargs and kwargs['rand'] == True:
+            self.proficiencies = sample(list(dnd.skill_list), 5)
+        for p in self.proficiencies:
+            self.skills[p] += self.prof_mod
         super().__init__(*args, **kwargs)
 
     def __str__(self):
@@ -119,19 +126,30 @@ class DNDChar(Character):
                 return pad(num, amount)
             else:
                 return pad("+" + str(num), amount)
-        out = f"{self.name} {self.surname}"
-        out += (f"\n{self.race.capitalize()} ({self.gender[0]}), {self.age} years old"
-                f"\nLevel {self.level} {self.prof.capitalize()}")
-                # I'm so sorry, PEP 8
-        out += ("\n-------------"
-                "\n|STR DEX CON|"
-                "\n|{0} {1} {2}|".format(*[pad(self.stats[x]) for x in ('str', 'dex', 'con')])
-               +"\n|{0} {1} {2}|".format(*[padmod(self.mods[x]) for x in ('str', 'dex', 'con')])
-               +"\n-------------"
-                "\n|INT WIS CHA|"
-                "\n|{0} {1} {2}|".format(*[pad(self.stats[x]) for x in ('int', 'wis', 'cha')])
-               +"\n|{0} {1} {2}|".format(*[padmod(self.mods[x]) for x in ('int', 'wis', 'cha')])
-               +"\n-------------")
+
+        with open("src/dnd_ascii_charsheet.txt", "r") as f:
+            sheet = f.read()
+        # Utterly illegible TODO fixme
+        skill_strs = []
+        for s in dnd.skill_list:
+            o = padmod(self.skills[s], 3)
+            if s in self.proficiencies:
+                o += "*"
+            else:
+                o += " "
+            skill_strs.append(o)
+        out = sheet.format(
+            self.name.ljust(18, " "),
+            self.surname.ljust(18, " "),
+            self.prof.ljust(18, " "),
+            *[pad(self.stats[s], 3) for s in ('str', 'dex', 'con',
+                                              'int', 'wis', 'cha')],
+            *[padmod(self.mods[s], 3) for s in ('str', 'dex', 'con',
+                                                'int', 'wis', 'cha')],
+            padmod(self.prof_mod, 4),
+            padmod(self.mods['dex'], 4),
+            *skill_strs
+            )
         return out
 
 
@@ -203,7 +221,7 @@ def mainLoop():
                 print("- char(acter) [setting] [race] [gender] | random : describe a character")
                 print("- adv(enture) [source] : describe an adventure")
                 print("- q(uit): quit program")
-            elif inp[0] == "char" or inp[0] == "character":
+            elif inp[0] in ("char", "character"):
                 if inp[1] == "random":
                     char = Character.random()
                 else:
@@ -215,10 +233,10 @@ def mainLoop():
                 else:
                     char = DNDChar(*inp[1:])
                 print(char)
-            elif inp[0] == "adv" or inp[0] == "adventure":
+            elif inp[0] in ("adv", "adventure"):
                 new = Adventure(inp[1])
                 print(new)
-            elif inp[0] == "q" or inp[0] == "quit":
+            elif inp[0] in ("q", "quit", ":q"):
                 break
             else:
                 print(f" x {inp[0]} is not a supported command.")
