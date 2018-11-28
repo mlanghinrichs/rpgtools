@@ -11,115 +11,87 @@ faces = {
 }
 
 
-def std_inp(string):
-    """
-    Replaces alternate letter inputs with standard versions.
-    """
-    # Replacement values a -> b
-    repls = [("y", "p"), ("g", "a"), ("r", "c"), ("u", "d")]
+def sanitize(string):
+    """Replace alternate letter inputs with standard versions."""
 
-    # For each letter-pair tuple, replace all of a in input with b
-    for tup in repls:
-        string = string.replace(*tup)
-
-    # Filter bad letters
-    string = ''.join(c for c in string if c in 'pacdsb')
-
-    # Return the fixed string
+    # Allow for some valid letter options
+    replacements = [("y", "p"), ("g", "a"), ("r", "c"), ("u", "d")]
+    for tuple_ in replacements:
+        string = string.replace(*tuple_)
+    # Keep only the desired letters
+    string = ''.join(char for char in string if char in 'pacdsb')
     return string
 
 
-def roll(string):
-    """
-    Take a passed string, roll dice and return list of results.
-    """
+class Roll():
+    """Take a passed string, roll dice and return list of results."""
 
-    # Clean up input to avoid bad letters
-    string = std_inp(string)
+    def __init__(self, string):
+        string = sanitize(string)
+        pool = []
+        for let in string:
+            pool.append(random.choice(faces[let]))
+        self.raw_pool = pool
+        # Join all results, as some are multiple letters, then resplit
+        self.symbols = list("".join(pool))
 
-    # Define list for roll results to be dumped into
-    results = []
+        # For each triumph, add a success
+        for n in range(self.symbols.count("T")):
+            self.symbols.append("s")
+        # For each despair, add a failure
+        for n in range(self.symbols.count("D")):
+            self.symbols.append("f")
 
-    # Append a random face for each die letter in string
-    for let in string:
-        if let in faces:
-            results.append(random.choice(faces[let]))
+        def cancel(*args):
+            for x in args:
+                pool.remove(x)
+        while True:
+            if "s" in pool and "f" in pool:
+                cancel("s", "f")
+            elif "a" in pool and "d" in pool:
+                cancel("a", "d")
+            else:
+                break
+        self.pool = pool
+
+
+    def __str__(self):
+
+        output = ""
+        # Check for special case where everything cancels out
+        if len(self.pool) == 0:
+            return "You failed with an empty pool."
+
+        # Check for success/failure
+        if "s" in self.pool and self.pool.count("s") > 1:
+            output += "You succeeded with %d successes" % pool.count("s")
+        elif "s" in self.pool:
+            output += "You succeeded with 1 success"
+        elif "f" in self.pool and self.pool.count("d") > 1:
+            output += "You failed with %d failures" % self.pool.count("f")
+        elif "f" in self.pool:
+            output += "You failed with 1 failure"
         else:
-            print("Passed bad face letters!")
-            return
+            output += "You failed with 0 successes"
 
-    # Join all results, as some are multiple letters, then resplit
-    n = "".join(results)
-    symbols = list(n)
-
-    # For each triumph, add a success
-    for n in range(symbols.count("T")):
-        symbols.append("s")
-
-    # For each despair, add a failure
-    for n in range(symbols.count("D")):
-        symbols.append("f")
-
-# Utility func to remove one each of 1 or 2 values from arg list
-    def cancel(*args):
-        for x in args:
-            symbols.remove(x)
-
-    # Iterate results until all opp symbol pairs are cancelled
-    while True:
-        if "s" in symbols and "f" in symbols:
-            cancel("s", "f")
-        elif "a" in symbols and "d" in symbols:
-            cancel("a", "d")
+        # Check for adv/disadv and complete sentence
+        if "a" in self.pool:
+            output += " and %d advantage." % self.pool.count("a")
+        elif "d" in self.pool:
+            output += " and %d threat." % self.pool.count("d")
         else:
-            break
+            output += "."
 
-    # Return results list
-    return symbols
+        # Check for triumph and dispair
+        if "T" in self.pool and "D" in self.pool:
+            td = (self.pool.count("T"), self.pool.count("D"))
+            output += " You got {0} Triumph and {1} Despair.".format(td[0], td[1])
+        elif "T" in self.pool:
+            output += " You got %d Triumph." % self.pool.count("T")
+        elif "D" in self.pool:
+            output += " You got %d Despair." % self.pool.count("D")
 
-
-def describe(pool):
-    """
-    Given a clean pool, return a string helpfully describing the roll results.
-    """
-
-    # Initiate output string
-    output = ""
-
-    # Check for special case where everything cancels out
-    if len(pool) == 0:
-        return "You failed with an empty pool."
-
-    # Check for success/failure
-    if "s" in pool and pool.count("s") > 1:
-        output += "You succeeded with %d successes" % pool.count("s")
-    elif "s" in pool:
-        output += "You succeeded with 1 success"
-    elif "f" in pool and pool.count("d") > 1:
-        output += "You failed with %d failures" % pool.count("f")
-    elif "f" in pool:
-        output += "You failed with 1 failure"
-    else:
-        output += "You failed with 0 successes"
-
-    # Check for adv/disadv and complete sentence
-    if "a" in pool:
-        output += " and %d advantage." % pool.count("a")
-    elif "d" in pool:
-        output += " and %d threat." % pool.count("d")
-    else:
-        output += "."
-
-    if "T" in pool and "D" in pool:
-        td = (pool.count("T"), pool.count("D"))
-        output += " You got {0} Triumph and {1} Despair.".format(td[0], td[1])
-    elif "T" in pool:
-        output += " You got %d Triumph." % pool.count("T")
-    elif "D" in pool:
-        output += " You got %d Despair." % pool.count("D")
-
-    # Return finished sentence
-    return output
+        return output
 
 
 @time_me
@@ -129,7 +101,7 @@ def sprob(string):
     """
 
     # Standardize the input string
-    string = std_inp(string)
+    string = sanitize(string)
 
     # Confirm string length 0<x<9
     if not (len(string) > 0 and len(string) < 9):
@@ -137,7 +109,7 @@ def sprob(string):
         return
 
     # Empty list of possible pools given string
-    p_pools = []
+    possible_pools = []
     temp_f = {
         "b": [0, 0, 1],  # Boost die faces
         "s": [0, 0, -1],  # Setback die faces
@@ -149,30 +121,29 @@ def sprob(string):
 
     # For each letter in the string...
     for let in string:
-        if len(p_pools) > 0:    # If there are already sample pools in the list,
+        if len(possible_pools) > 0:    # If there are already sample pools in the list,
             temp_list = []      # 1. Create a holding list
-            for s in p_pools:   # 2. Then for each pre-existing sample pool,
+            for s in possible_pools:   # 2. Then for each pre-existing sample pool,
                 for f in temp_f[let]:    # 3. For each possible roll,
                     temp_list.append(s + f)     # 4. Add one new pool to the holding list
-            p_pools = temp_list     # 4. Then set the full pool list to equal the holding list
+            possible_pools = temp_list     # 4. Then set the full pool list to equal the holding list
         else:
             for f in temp_f[let]:
-                p_pools.append(f)
+                possible_pools.append(f)
 
     # Tally of successful pools
     success = 0
 
-    # For each pool in p_pools, check if it's successful and increment success tally if it is
-    for r in p_pools:
+    # For each pool in possible_pools, check if it's successful and increment success tally if it is
+    for r in possible_pools:
        if r > 0:
            success += 1
 
     # Calculate % of pools which are successful and return a rounded percentage
-    prob = success/len(p_pools)
+    prob = success/len(possible_pools)
     return round(100*prob, 2)
     
 
-# UI loop for when running file
 if __name__ == "__main__":
     while True:
         inp = input("String to roll? > ").split()

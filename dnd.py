@@ -92,11 +92,6 @@ class Roll():
         return cls(num, die, mod, dropleast=True)
 
 
-class Poly():
-
-    def __init__(self, args):
-        pass
-
 class CharGen():
 
     def __init__(self):
