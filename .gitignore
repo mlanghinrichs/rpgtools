@@ -1,2 +1,4 @@
 goh_advs/
 __pycache__/
+*.xml
+*.egg-info

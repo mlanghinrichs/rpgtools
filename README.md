@@ -1,4 +1,6 @@
-This project is a nascent python module for tabletop rpg generation and statistical tools. 
+**FIXME - This readme is OUT OF DATE!**
+
+This project is a nascent python module for tabletop rpg generation and statistical tools.
 
 rpg.py contains Character and Adventure classes for generating those, as well as utility functions to extract data from json, generate names from text strings, etc.
 
