@@ -21,22 +21,87 @@ SKILLS = {"Acrobatics": "dex",
           "Survival": "wis"
           }
 
+CLASS_SKILLS = {"barbarian": (
+                    "Animal Handling",
+                    "Athletics",
+                    "Intimidation",
+                    "Nature",
+                    "Perception",
+                    "Survival"
+                ),
+                "bard": tuple(SKILLS),
+                "cleric": (
+                    "History",
+                    "Insight",
+                    "Medicine",
+                    "Persuasion",
+                    "Religion"
+                ),
+                "druid": (
+
+                ),
+                "fighter": (
+
+                ),
+                "monk": (
+
+                ),
+                "paladin": (
+
+                ),
+                "ranger": (
+
+                ),
+                "rogue": (
+
+                ),
+                "sorcerer": (
+
+                ),
+                "warlock": (
+
+                ),
+                "wizard": (
+
+                )}
+
+CLASS_NUMBER_PROFICIENCIES = {"barbarian": 2,
+                              "bard": 3,
+                              "cleric": 2,
+                              "druid": 0,
+                              "fighter": 0,
+                              "monk": 0,
+                              "paladin": 0,
+                              "ranger": 0,
+                              "rogue": 0,
+                              "sorcerer": 0,
+                              "warlock": 0,
+                              "wizard": 0}
+
 STATS = ("str", "dex", "con", "int", "wis", "cha")
-STATS_FULL_NAMES = ("strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma")
+STATS_FULL_NAMES = ("strength",
+                    "dexterity",
+                    "constitution",
+                    "intelligence",
+                    "wisdom",
+                    "charisma")
 
 
 class Roll:
 
     def __init__(self, num=1, die=20, mod=0, *, dropleast=False, **kwargs):
-        # Save num, die, and mod to object's dict
-        self.__dict__.update((k, v) for k, v in vars().items() if k in ("num", "die", "mod"))
+        self.num = num
+        self.die = die
+        self.mod = mod
+
         self.rolls = []
         for i in range(num):
             self.rolls.append(randint(1, die))
         if dropleast:
             self.rolls.remove(min(self.rolls))
-        self.result = sum(self.rolls) + mod
-        if "result" in kwargs.keys():
+        if "result" not in kwargs:
+            self.result = sum(self.rolls) + mod
+        else:
             self.result = kwargs['result']
 
     def __str__(self):
@@ -45,7 +110,7 @@ class Roll:
     def __lt__(self, other):
         if isinstance(other, Roll):
             return self.result < other.result
-        elif isinstance(other, int):
+        elif isinstance(other, int) or isinstance(other, float):
             return self.result < other
         else:
             raise TypeError(f"Can't compare {type(other)} with a Roll!")
@@ -53,7 +118,7 @@ class Roll:
     def __gt__(self, other):
         if isinstance(other, Roll):
             return self.result > other.result
-        elif isinstance(other, int):
+        elif isinstance(other, int) or isinstance(other, float):
             return self.result > other
         else:
             raise TypeError(f"Can't compare {type(other)} with a Roll!")
@@ -61,10 +126,13 @@ class Roll:
     def __int__(self):
         return int(self.result)
 
+    def __float__(self):
+        return float(self.results)
+
     def __add__(self, other):
         if isinstance(other, Roll):
             return self.result + other.result
-        elif isinstance(other, int):
+        elif isinstance(other, int) or isinstance(other, float):
             return self.result + other
         else:
             raise TypeError(f"Can't add {type(other)} to a Roll!")
@@ -72,7 +140,7 @@ class Roll:
     def __sub__(self, other):
         if isinstance(other, Roll):
             return self.result - other.result
-        elif isinstance(other, int):
+        elif isinstance(other, int) or isinstance(other, float):
             return self.result - other
         else:
             raise TypeError(f"Can't subtract {type(other)} from a Roll!")
@@ -80,7 +148,7 @@ class Roll:
     def __radd__(self, other):
         if isinstance(other, Roll):
             return other.result + self.result
-        elif isinstance(other, int):
+        elif isinstance(other, int) or isinstance(other, float):
             return other + self.result
         else:
             raise TypeError(f"Can't add a Roll to {type(other)}!")
@@ -88,13 +156,13 @@ class Roll:
     def __rsub__(self, other):
         if isinstance(other, Roll):
             return other.result - self.result
-        elif isinstance(other, int):
+        elif isinstance(other, int) or isinstance(other, float):
             return other - self.result
         else:
             raise TypeError(f"Can't subtract a Roll from {type(other)}!")
 
     @classmethod
-    def string(cls, string):
+    def from_string(cls, string):
         mod = 0
         # Check if + or - is in the string and log its location
         ind = max(string.find('+'), string.find('-'))
@@ -121,39 +189,57 @@ class Roll:
 
     @classmethod
     def drop_least(cls, num=4, die=6, mod=0):
-        """Return a multi-die Roll with the lowest result among the dice dropped."""
+        """Return a multi-die Roll with the lowest die roll dropped."""
         return cls(num, die, mod, dropleast=True)
 
 
 class DndCharacter(rpgtools.Character):
 
-    def __init__(self, *, dnd_class="fighter", race="human", gender="female", level=1, proficiencies=(), stats=()):
-        super().__init__(setting="fantasy",race=race, gender=gender)
+    def __init__(self, **kwargs):
+        super().__init__(setting="fantasy", **kwargs)
+
         self.stats = {}
-        if stats and isinstance(stats, tuple):
-            self.set_stats(*stats)
-        else:
-            self.roll_stats()
         self.mods = {}
+        self.skill_mods = {}
+        for item in ("stats",
+                     "level",
+                     "dnd_class",
+                     "proficiencies"):
+            if item in kwargs and item != "stats":
+                self.__dict__[item] = kwargs[item]
+            elif item in kwargs and item == "stats":
+                self.set_stats(*kwargs["stats"])
+            else:
+                if item == "stats":
+                    self.roll_stats()
+                elif item == "level":
+                    self.level = 1
+                elif item == "dnd_class":
+                    self.dnd_class = "npc"
+                elif self.dnd_class == "npc" and item == "proficiencies":
+                    self.proficiencies = sample(list(SKILLS), 5)
+                elif self.dnd_class != "npc" and item == "proficiencies":
+                    c = self.dnd_class
+                    self.proficiencies = sample(CLASS_SKILLS[c],
+                                                CLASS_NUMBER_PROFICIENCIES[c])
         self.update_mods()
-        self.level = level
-        self.proficiencies = proficiencies
+        self.update_skill_mods()
 
     def roll_stats(self):
         for stat in ("str", "dex", "con", "int", "wis", "cha"):
             self.stats[stat] = int(Roll.drop_least())
 
     def set_stats(self, *args):
-        all_ints = True
+        # Check input type
         for item in args:
             if not isinstance(item, int):
-                all_ints = False
-        if len(args) == 6 and all_ints:
+                raise KeyError(f"set_stats() requires integer inputs!")
+        try:
             for i in range(6):
                 self.stats[STATS[i]] = args[i]
             self.update_mods()
-        else:
-            raise KeyError("Set_stats requires six integer inputs!")
+        except IndexError:
+            raise IndexError("set_stats() requires 6 inputs!")
 
     def update_mods(self):
         for stat in self.stats.keys():
@@ -161,47 +247,9 @@ class DndCharacter(rpgtools.Character):
         # 5e proficiency mod scales with this formula (2 @ 1-4, 3 @ 5-8, etc)
         self.prof_mod = (self.level - 1) // 4 + 2
 
-    # def __str__(self):
-    #     # Hidden functions to shorten code below
-    #     def pad(num, amount=3):
-    #         return str(num).rjust(amount, " ")
-    #     def padmod(num, amount=3):
-    #         """Pad & format modifier"""
-    #         if num < 0:
-    #             return pad(num, amount)
-    #         else:
-    #             return pad("+" + str(num), amount)
-    #
-    #     with open("src/dnd_ascii_charsheet.txt", "r") as f:
-    #         ascii_sheet = f.read()
-    #     pretty_print_skill_mods = []
-    #     for s in dnd.SKILLS:
-    #         mod = padmod(self.skills[s], 3)
-    #         # Mark proficient skills but make prof and non-prof the same length
-    #         # to fit charsheet
-    #         if s in self.proficiencies:
-    #             mod += "*"
-    #         else:
-    #             mod += " "
-    #         pretty_print_skill_mods.append(mod)
-    #     out = ascii_sheet.format(
-    #         self.name.ljust(18, " "),
-    #         self.surname.ljust(18, " "),
-    #         self.prof.ljust(18, " "),
-    #         *[pad(self.stats[s], 3) for s in ('str', 'dex', 'con',
-    #                                           'int', 'wis', 'cha')],
-    #         *[padmod(self.mods[s], 3) for s in ('str', 'dex', 'con',
-    #                                             'int', 'wis', 'cha')],
-    #         padmod(self.prof_mod, 4),
-    #         padmod(self.mods['dex'], 4),
-    #         *pretty_print_skill_mods
-    #         )
-    #     return out
-
-    # TODO - Complete this method
-    @classmethod
-    def random(cls):
-        self.proficiencies = sample(list(SKILLS), 5)
-        for p in self.proficiencies:
-            self.skills[p] += self.prof_mod
-    # proficiencies and level not used by Character so don't bother passing
+    def update_skill_mods(self):
+        for key in SKILLS:
+            skill = self.mods[SKILLS[key]]
+            if key in self.proficiencies:
+                skill += self.prof_mod
+            self.skill_mods[key] = skill
