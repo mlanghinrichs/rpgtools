@@ -1,5 +1,14 @@
-# <type>(optional scope): <description
+# <type>(optional scope): <description>
 #
 # [optional body]
 #
 # [optional footer]
+#
+# valid scopes:
+#     * feat (feature)
+#     * fix (bug fix)
+#     * docs (documentation)
+#     * style (formatting, missing semicolons, …)
+#     * refactor
+#     * test (when adding missing tests)
+#     * chore (maintain)

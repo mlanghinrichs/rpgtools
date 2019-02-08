@@ -41,7 +41,7 @@ def _extract_choice(dct, *args):
         return ''
 
 
-def generate_name_from_list(list_):
+def _generate_name_from_list(list_):
     """Pass a generator list and return the generated string."""
     """Input format: 'x,' for choice of x or nul; 'x,y' for choice of x or y;
     'x,y,' for a choice of x or y or nul. Pass a list in the order of
@@ -58,7 +58,7 @@ def _generate_name_from_json(*args):
     inp = _extract(CHAR_DICT, *args)
     # Generate from generator, pick from list
     if isinstance(inp, str):
-        return generate_name_from_list(inp.split(';'))
+        return _generate_name_from_list(inp.split(';'))
     elif isinstance(inp, list):
         return choice(inp)
     else:
@@ -68,28 +68,68 @@ def _generate_name_from_json(*args):
 class Character:
     """A class for RPG characters. Can generate PCs or NPCs with names &c."""
 
-    def __init__(self, *, setting, race, gender):
-        self.__dict__.update((k, v) for k, v in vars().items() if k != 'self')
-        self.name = _generate_name_from_json(setting, race, gender)
-        self.surname = _generate_name_from_json(setting, race, 'surnames')
-        # TODO add exception handling
-        self.age = randint(*_extract(CHAR_DICT, setting, race, 'agerange'))
-        for f in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
-            self.__dict__[f] = _extract_choice(CHAR_DICT, setting, f)
+    def __init__(self, **kwargs):
+        v = vars()["kwargs"]
+        self.setting = self._choose_setting(v)
+        self.race = self._choose_race(v)
+        self.gender = self._choose_gender(v)
+        self.name = self._choose_name(v)
+        self.surname = self._choose_surname(v)
+        self.age = self._choose_age(v)
+        self.personality = self._choose_personality(v)
 
     def __str__(self):
-        out = [f"{str(k).rjust(10, ' ')}: {str(v)}" for (k, v) in self.__dict__.items()]
+        out = [f"{str(key).rjust(10, ' ')}: {str(val)}"
+               for (key, val) in self.__dict__.items()]
         return "\n".join(out)
 
-    @classmethod
-    def random(cls, setting):
-        """Build a character with random attributes from the setting."""
-        # Check setting dict for sub-dicts with an "agerange" key to filter out quirks etc.
-        races = filter(lambda x: 'agerange' in CHAR_DICT[setting][x],
-                       iter(CHAR_DICT[setting]))
-        race = choice(list(races))
-        gender = choice(('male', 'female'))
-        return cls(setting, race, gender, rand=True)
+    # --- Initial randomization for unspecified characteristics ---
+    def _choose_setting(self, args):
+        if "setting" in args:
+            return args["setting"]
+        else:
+            return choice(list(CHAR_DICT))
+
+    def _choose_race(self, args):
+        if "race" in args:
+            return args["race"]
+        else:
+            races = [race for race in list(CHAR_DICT[self.setting])
+                     if race not in ("quirk", "strength", "flaw", "desire", "fear")]
+            return choice(races)
+
+    def _choose_gender(self, args):
+        if "gender" in args:
+            return args["gender"]
+        else:
+            return choice(("male", "female"))
+
+    def _choose_name(self, args):
+        if "name" in args:
+            return args["name"]
+        else:
+            return _generate_name_from_json(self.setting, self.race, self.gender)
+
+    def _choose_surname(self, args):
+        if "surname" in args:
+            return args["surname"]
+        else:
+            return _generate_name_from_json(self.setting, self.race, "surnames")
+
+    def _choose_age(self, args):
+        if "age" in args:
+            return args["age"]
+        else:
+            return randint(*_extract(CHAR_DICT, self.setting, self.race, 'agerange'))
+
+    def _choose_personality(self, args):
+        if "personality" in args:
+            return args["personality"]
+        else:
+            _dict = {}
+            for item in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
+                _dict[item] = _extract_choice(CHAR_DICT, self.setting, item)
+            return _dict
 
 
 class Adventure:
