@@ -54,7 +54,7 @@ def _generate_name_from_list(list_):
 
 
 def _generate_name_from_json(*args):
-    """Return a generated name from char_dict using args as path to generator."""
+    """Return generated name from char_dict using args as path to generator."""
     inp = _extract(CHAR_DICT, *args)
     # Generate from generator, pick from list
     if isinstance(inp, str):
@@ -66,70 +66,60 @@ def _generate_name_from_json(*args):
 
 
 class Character:
-    """A class for RPG characters. Can generate PCs or NPCs with names &c."""
+    """A class for RPG characters. Can generate PCs or NPCs with names &c.
+
+    Customizable attributes:
+        * setting: fantasy, steampunk
+        * race: human, elf, halforc, etc.
+        * gender: male, female
+        * name: (string)
+        * surname: (string)
+        * age: (int)
+        * personality: (dict)"""
 
     def __init__(self, **kwargs):
-        v = vars()["kwargs"]
-        self.setting = self._choose_setting(v)
-        self.race = self._choose_race(v)
-        self.gender = self._choose_gender(v)
-        self.name = self._choose_name(v)
-        self.surname = self._choose_surname(v)
-        self.age = self._choose_age(v)
-        self.personality = self._choose_personality(v)
+        for item in ("setting",
+                     "race",
+                     "gender",
+                     "name",
+                     "surname",
+                     "age",
+                     "personality"):
+            self.__dict__[item] = self._choose(item, vars()["kwargs"])
 
     def __str__(self):
         out = [f"{str(key).rjust(10, ' ')}: {str(val)}"
                for (key, val) in self.__dict__.items()]
         return "\n".join(out)
 
-    # --- Initial randomization for unspecified characteristics ---
-    def _choose_setting(self, args):
-        if "setting" in args:
-            return args["setting"]
+    # --- Randomization for unspecified characteristics ---
+    def _choose(self, item, args):
+        if item in args:
+            return args["item"]
         else:
-            return choice(list(CHAR_DICT))
-
-    def _choose_race(self, args):
-        if "race" in args:
-            return args["race"]
-        else:
-            races = [race for race in list(CHAR_DICT[self.setting])
-                     if race not in ("quirk", "strength", "flaw", "desire", "fear")]
-            return choice(races)
-
-    def _choose_gender(self, args):
-        if "gender" in args:
-            return args["gender"]
-        else:
-            return choice(("male", "female"))
-
-    def _choose_name(self, args):
-        if "name" in args:
-            return args["name"]
-        else:
-            return _generate_name_from_json(self.setting, self.race, self.gender)
-
-    def _choose_surname(self, args):
-        if "surname" in args:
-            return args["surname"]
-        else:
-            return _generate_name_from_json(self.setting, self.race, "surnames")
-
-    def _choose_age(self, args):
-        if "age" in args:
-            return args["age"]
-        else:
-            return randint(*_extract(CHAR_DICT, self.setting, self.race, 'agerange'))
-
-    def _choose_personality(self, args):
-        if "personality" in args:
-            return args["personality"]
-        else:
-            _dict = {}
-            for item in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
-                _dict[item] = _extract_choice(CHAR_DICT, self.setting, item)
-            return _dict
+            if item == "setting":
+                return choice(list(CHAR_DICT))
+            elif item == "race":
+                races = [race for race in list(CHAR_DICT[self.setting])
+                         if race not in
+                         ("quirk", "strength", "flaw", "desire", "fear")]
+                return choice(races)
+            elif item == "gender":
+                return choice(("male", "female"))
+            elif item == "name":
+                new_args = (self.setting, self.race, self.gender)
+                return _generate_name_from_json(*new_args)
+            elif item == "surname":
+                new_args = (self.setting, self.race, "surnames")
+                return _generate_name_from_json(*new_args)
+            elif item == "age":
+                r = _extract(CHAR_DICT, self.setting, self.race, 'agerange')
+                return randint(*r)
+            elif item == "personality":
+                dct = {}
+                for item in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
+                    dct[item] = _extract_choice(CHAR_DICT, self.setting, item)
+                return dct
 
 
 class Adventure:
@@ -137,13 +127,16 @@ class Adventure:
 
     def __init__(self, adv_type, *, num_hours=3, num_elements=5, **kwargs):
         # Temp variables to shorten code
+        def _extr_adv(string):
+            return _extract_choice(ADV_DICT, adv_type, string)
+
         d = ADV_DICT
         t = adv_type
 
-        self.locale = _extract_choice(d, t, 'locales')
-        self.sub_locale = _extract_choice(d, t, 'sub_locales')
-        self.plot = _extract_choice(d, t, 'plots')
-        self.objective = _extract_choice(d, t, 'objectives')
+        self.locale = _extr_adv('locales')
+        self.sub_locale = _extr_adv('sub_locales')
+        self.plot = _extr_adv('plots')
+        self.objective = _extr_adv('objectives')
         self.hours = sample(_extract(d, t, 'hours'), num_hours)
         self.quest_giver = Character.random('fantasy')
 
@@ -156,14 +149,16 @@ class Adventure:
 
         # If user manually entered any details, overwrite the generated ones
         # TODO FIXME this does not work!
-        self.__dict__.update((k, v) for k, v in vars().items() if k in ['locale',
-                                                                        'sub_locale', 'plot', 'objective', 'hours',
-                                                                        'story_elements', 'num_elements'])
+        self.__dict__.update((k, v) for k, v in vars().items()
+                             if k in ['locale', 'sub_locale', 'plot',
+                                      'objective', 'hours', 'story_elements',
+                                      'num_elements'])
         self.title = "THE " + _extract_choice(d, t, 'title_elements').upper()
         self.title += " OF " + self.locale.upper()
 
     def __str__(self):
-        out = f"\n{self.title}\nIn {self.locale}, in {self.sub_locale};\nA {self.plot}, to {self.objective}."
+        out = f"\n{self.title}\nIn {self.locale}, in {self.sub_locale};"
+        out += f"\nA {self.plot}, to {self.objective}."
         out += f"\n\nGiven by:\n{self.quest_giver}\n"
         for i in range(len(self.hours)):
             out += f"\nIn hour {i + 1}, {self.hours[i]}:"
