@@ -85,7 +85,7 @@ class Character:
                      "surname",
                      "age",
                      "personality"):
-            self.__dict__[item] = self._choose(item, vars()["kwargs"])
+            self.__dict__[item] = self._choose(item, kwargs)
 
     def __str__(self):
         out = [f"{str(key).rjust(10, ' ')}: {str(val)}"
@@ -95,7 +95,7 @@ class Character:
     # --- Randomization for unspecified characteristics ---
     def _choose(self, item, args):
         if item in args:
-            return args["item"]
+            return args[item]
         else:
             if item == "setting":
                 return choice(list(CHAR_DICT))
@@ -123,58 +123,106 @@ class Character:
 
 
 class Adventure:
-    """Contains randomly generated data for running a session."""
+    """Contains randomly generated data for running a session.
 
-    def __init__(self, adv_type, *, num_hours=3, num_elements=5, **kwargs):
-        # Temp variables to shorten code
-        def _extr_adv(string):
-            return _extract_choice(ADV_DICT, adv_type, string)
+    Passable arguments:
+        adv_type: 'goh', 'roshar' - body of ADV_DICT from which to pull data
+        num_hours: int, the number of hours for which to generate elements
+        num_elements: int, the number of elements to generate per hour
+        locale: string, the region where the adventure takes place
+        sub_locale: string, specific area in that region where it takes place
+        plot: string, genre of adventure
+        objective: string, grammar is imperative ("find a macguffin")
+        hours: (overall description of an hour's plot * num_hours)
+        story_atoms: ((element * num_elements) * num_hours)
+        quest_giver: Character object
+        title: string"""
 
-        d = ADV_DICT
-        t = adv_type
-
-        self.locale = _extr_adv('locales')
-        self.sub_locale = _extr_adv('sub_locales')
-        self.plot = _extr_adv('plots')
-        self.objective = _extr_adv('objectives')
-        self.hours = sample(_extract(d, t, 'hours'), num_hours)
-        self.quest_giver = Character.random('fantasy')
-
-        # Make temp list so we don't have to open and close the file
-        story_elements = _extract(d, t, 'story_elements')
-        self.story_atoms = []
-        for i in range(num_elements):
-            elems = sample(story_elements, num_elements)
-            self.story_atoms.append(elems)
-
-        # If user manually entered any details, overwrite the generated ones
-        # TODO FIXME this does not work!
-        self.__dict__.update((k, v) for k, v in vars().items()
-                             if k in ['locale', 'sub_locale', 'plot',
-                                      'objective', 'hours', 'story_elements',
-                                      'num_elements'])
-        self.title = "THE " + _extract_choice(d, t, 'title_elements').upper()
-        self.title += " OF " + self.locale.upper()
+    # Required stuff: adventure type, num_hours, num_elements,
+    # locale, sub_locale, plot, objective, (hours), quest_giver, (story_atoms)
+    def __init__(self, **kwargs):
+        for item in ("adv_type",
+                     "num_hours",
+                     "num_elements",
+                     "locale",
+                     "sub_locale",
+                     "plot",
+                     "objective",
+                     "hours",
+                     "story_atoms",
+                     "quest_giver",
+                     "title"):
+            self.__dict__[item] = self._choose(item, kwargs)
 
     def __str__(self):
-        out = f"\n{self.title}\nIn {self.locale}, in {self.sub_locale};"
-        out += f"\nA {self.plot}, to {self.objective}."
-        out += f"\n\nGiven by:\n{self.quest_giver}\n"
+        out = (f"\n{self.title}"
+               + f"\nIn {self.locale}, in {self.sub_locale};"
+               + f"\nA {self.plot}, to {self.objective}."
+               + "\n\nGiven by:"
+               + f"\n{self.quest_giver}\n")
         for i in range(len(self.hours)):
             out += f"\nIn hour {i + 1}, {self.hours[i]}:"
             for j in range(self.num_elements):
                 out += f"\n    {j + 1}. {self.story_atoms[i][j]}"
         return out
 
+    def _extr_adv(self, elem):
+        """Extract adventure element from ADV_DICT[adv_type]."""
+        return _extract_choice(ADV_DICT, self.adv_type, elem)
+
+    def _choose(self, item, args):
+
+        if item in args:
+            return args[item]
+        else:
+            if item == "adv_type":
+                return choice(list(ADV_DICT))
+            elif item == "num_hours":
+                return 3
+            elif item == "num_elements":
+                return 5
+            elif item == "locale":
+                return self._extr_adv('locales')
+            elif item == "sub_locale":
+                return self._extr_adv('sub_locales')
+            elif item == "plot":
+                return self._extr_adv('plots')
+            elif item == "objective":
+                return self._extr_adv('objectives')
+            elif item == "hours":
+                return sample(_extract(ADV_DICT, self.adv_type, 'hours'),
+                              self.num_hours)
+            elif item == "quest_giver":
+                return Character()
+            elif item == "story_atoms":
+                story_elements = _extract(ADV_DICT, self.adv_type,
+                                          'story_elements')
+                out = []
+                for i in range(self.num_hours):
+                    elems = sample(story_elements, self.num_elements)
+                    out.append(elems)
+                return out
+            elif item == "title":
+                out = (
+                   "THE "
+                   + _extract_choice(ADV_DICT, self.adv_type, 'title_elements')
+                   + " OF "
+                   + self.locale
+                )
+                return out.upper()
+
+    def build_quest_giver(self, **kwargs):
+        self.quest_giver = Character(**kwargs)
+
     def write(self, direc):
         """Write details to a txt file in ./{direc}/ named after the title."""
 
         # craft a string with the full save-to path & filename
-        path = direc + "/" + self.title.replace(" ", "") + ".txt"
-        # fix dramatic title capitalization
-        path = path.lower()
+        file_name = self.title.replace(" ", "") + ".txt"
+        file_name = file_name.lower()
+        to_save = path.join(direc, file_name)
         # make sure the filename doesn't exist yet
-        if not path.isfile(path):
-            with open(path, "w") as f:
+        if not path.isfile(to_save):
+            with open(to_save, "w") as f:
                 f.write(str(self))
-            print("Wrote to " + path)
+            print("Wrote to " + to_save)
