@@ -1,20 +1,23 @@
+"""Container module for the rpgtools packages."""
+
 from random import choice, randint, sample
 from os import path
 import json
 
 
-def load_dict(filename):
+def _load_dict(filename):
+    """Load a .json file from ./src/ and return it."""
     with open(path.join(path.dirname(__file__), 'src', filename), "r") as f:
         return json.load(f)
 
 
 # Preload json data to reduce resource use
-CHAR_DICT = load_dict("char.json")
-ADV_DICT = load_dict("adv.json")
+CHAR_DICT = _load_dict("char.json")
+ADV_DICT = _load_dict("adv.json")
 
 
 # Simplify repeated calls for items in JSON dicts
-def extract(dict_, *args):
+def _extract(dict_, *args):
     """Return dict_[arg 1][arg 2]...[arg n]"""
     current = dict_
     try:
@@ -24,13 +27,13 @@ def extract(dict_, *args):
     except KeyError:
         # Return a list with blank str so name generation uses choice() and not
         # name_gen_list()
-        print(f"Failed to pull {args} with rpg.extract()! Returning ['']")
+        print(f"Failed to pull {args} with rpg._extract()! Returning ['']")
         return ['']
 
 
-def extract_choice(dct, *args):
+def _extract_choice(dct, *args):
     """Extract() a list and return a random.choice()"""
-    lst = extract(dct, *args)
+    lst = _extract(dct, *args)
     try:
         return choice(lst)
     except TypeError:
@@ -39,11 +42,10 @@ def extract_choice(dct, *args):
 
 
 def generate_name_from_list(list_):
-    """Return a name string generated from inputted generator list."""
+    """Pass a generator list and return the generated string."""
     """Input format: 'x,' for choice of x or nul; 'x,y' for choice of x or y;
     'x,y,' for a choice of x or y or nul. Pass a list in the order of
     generation, choices from which will be concatenated."""
-
     out = ""
     # For each line of the generator file, append an option on that line to out
     for string in list_:
@@ -51,11 +53,10 @@ def generate_name_from_list(list_):
     return out.capitalize()
 
 
-def generate_name_from_json(*args):
+def _generate_name_from_json(*args):
     """Return a generated name from char_dict using args as path to generator."""
-    inp = extract(CHAR_DICT, *args)
-
-    # Proper list vs generator behavior - generate from generator, pick from list
+    inp = _extract(CHAR_DICT, *args)
+    # Generate from generator, pick from list
     if isinstance(inp, str):
         return generate_name_from_list(inp.split(';'))
     elif isinstance(inp, list):
@@ -69,12 +70,12 @@ class Character:
 
     def __init__(self, *, setting, race, gender):
         self.__dict__.update((k, v) for k, v in vars().items() if k != 'self')
-        self.name = generate_name_from_json(setting, race, gender)
-        self.surname = generate_name_from_json(setting, race, 'surnames')
+        self.name = _generate_name_from_json(setting, race, gender)
+        self.surname = _generate_name_from_json(setting, race, 'surnames')
         # TODO add exception handling
-        self.age = randint(*extract(CHAR_DICT, setting, race, 'agerange'))
+        self.age = randint(*_extract(CHAR_DICT, setting, race, 'agerange'))
         for f in ('quirk', 'strength', 'flaw', 'desire', 'fear'):
-            self.__dict__[f] = extract_choice(CHAR_DICT, setting, f)
+            self.__dict__[f] = _extract_choice(CHAR_DICT, setting, f)
 
     def __str__(self):
         out = [f"{str(k).rjust(10, ' ')}: {str(v)}" for (k, v) in self.__dict__.items()]
@@ -99,15 +100,15 @@ class Adventure:
         d = ADV_DICT
         t = adv_type
 
-        self.locale = extract_choice(d, t, 'locales')
-        self.sub_locale = extract_choice(d, t, 'sub_locales')
-        self.plot = extract_choice(d, t, 'plots')
-        self.objective = extract_choice(d, t, 'objectives')
-        self.hours = sample(extract(d, t, 'hours'), num_hours)
+        self.locale = _extract_choice(d, t, 'locales')
+        self.sub_locale = _extract_choice(d, t, 'sub_locales')
+        self.plot = _extract_choice(d, t, 'plots')
+        self.objective = _extract_choice(d, t, 'objectives')
+        self.hours = sample(_extract(d, t, 'hours'), num_hours)
         self.quest_giver = Character.random('fantasy')
 
         # Make temp list so we don't have to open and close the file
-        story_elements = extract(d, t, 'story_elements')
+        story_elements = _extract(d, t, 'story_elements')
         self.story_atoms = []
         for i in range(num_elements):
             elems = sample(story_elements, num_elements)
@@ -118,7 +119,7 @@ class Adventure:
         self.__dict__.update((k, v) for k, v in vars().items() if k in ['locale',
                                                                         'sub_locale', 'plot', 'objective', 'hours',
                                                                         'story_elements', 'num_elements'])
-        self.title = "THE " + extract_choice(d, t, 'title_elements').upper()
+        self.title = "THE " + _extract_choice(d, t, 'title_elements').upper()
         self.title += " OF " + self.locale.upper()
 
     def __str__(self):

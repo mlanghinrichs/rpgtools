@@ -1,9 +1,11 @@
-**FIXME - This readme is OUT OF DATE!**
+## RPGTools ##
+This project is a nascent python module for tabletop rpg generation and statistical analysis. The primary module includes utility methods and all-purpose generators, and sub-modules contain system-specific utilities and objects.
+* * * * *
+### rpgtools - Container Module ###
+rpg.py contains Character and Adventure superclasses, as well as a handful of internal utility functions.
 
-This project is a nascent python module for tabletop rpg generation and statistical tools.
+### rpgtools.dnd - Dungeons and Dragons ###
+The dnd sub-module contains Roll and DndCharacter classes specific to 5th ed. Dungeons and Dragons. It will eventually contain D&D-specific adventures as well.
 
-rpg.py contains Character and Adventure classes for generating those, as well as utility functions to extract data from json, generate names from text strings, etc.
-
-dnd.py contains dice-rolling utilities and D&D-specific character generation functions. gsys.py contains the same for Genesys, along with a simulation-based dice roll probability calculator. rpg.py and gsys.py both have a main input loop and can be run as contained programs.
-
-Raw data for the rpg.py generators can be found in the tbls/ folder.
+### rpgtools.gsys - Genesys ###
+The gsys sub-module contains the Roll class for Fantasy Flight's Genesys RPG, including a static method for determining success probabilities in dice pools.
