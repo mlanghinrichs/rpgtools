@@ -1,13 +1,14 @@
 """Container module for the rpgtools packages."""
 
 from random import choice, randint, sample
-from os import path
+import os.path
 import json
 
 
 def _load_dict(filename):
     """Load a .json file from ./src/ and return it."""
-    with open(path.join(path.dirname(__file__), 'src', filename), "r") as f:
+    to_open = os.path.join(os.path.dirname(__file__), 'src', filename)
+    with open(to_open, "r") as f:
         return json.load(f)
 
 
@@ -214,15 +215,36 @@ class Adventure:
     def build_quest_giver(self, **kwargs):
         self.quest_giver = Character(**kwargs)
 
-    def write(self, direc):
-        """Write details to a txt file in ./{direc}/ named after the title."""
+    def markdown(self):
+        out = (f"## {self.title} ##"
+               + f"\nIn {self.locale}, in {self.sub_locale};"
+               + f" a {self.plot}, to {self.objective}."
+               + "\n\nGiven by: "
+               + f"{self.quest_giver.name } {self.quest_giver.surname}, "
+               + f"{self.quest_giver.race} {self.quest_giver.gender}.")
+        for i in range(len(self.hours)):
+            out += f"\n\nIn hour {i + 1}, {self.hours[i]}:\n"
+            for j in range(self.num_elements):
+                out += f"\n{j + 1}. {self.story_atoms[i][j]}"
+        return out
 
-        # craft a string with the full save-to path & filename
-        file_name = self.title.replace(" ", "") + ".txt"
-        file_name = file_name.lower()
-        to_save = path.join(direc, file_name)
-        # make sure the filename doesn't exist yet
-        if not path.isfile(to_save):
+    def write(self, _path="", file_format="text"):
+        """Write details to a file named after the title."""
+        file_name = self.title.replace(" ", "").lower()
+        output = ""
+
+        if file_format == "text":
+            output = str(self)
+            file_name += ".txt"
+        elif file_format == "markdown":
+            output = self.markdown()
+            file_name += ".md"
+
+        to_save = os.path.join(_path, file_name)
+        # Verify file doesn't already exist
+        if not os.path.isfile(to_save):
             with open(to_save, "w") as f:
-                f.write(str(self))
+                f.write(output)
             print("Wrote to " + to_save)
+        else:
+            print(f"A file exists at {to_save}!")

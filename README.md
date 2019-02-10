@@ -8,4 +8,4 @@ rpg.py contains generalized Character and Adventure superclasses.
 The dnd sub-module contains Roll and DndCharacter classes specific to 5th ed. _Dungeons and Dragons_. It will eventually contain D&D-specific adventures as well.
 
 ### rpgtools.gsys - Genesys ###
-The gsys sub-module contains the Roll class for Fantasy Flight's _Genesys_ RPG, including a static method for determining success probabilities in dice pools.
+The gsys sub-module contains the Roll class for Fantasy Flight's _Genesys_ RPG, including a static method for determining success probabilities in narrative dice pools.
