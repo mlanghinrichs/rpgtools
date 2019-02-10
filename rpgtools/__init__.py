@@ -122,6 +122,19 @@ class Character:
                     dct[item] = _extract_choice(CHAR_DICT, self.setting, item)
                 return dct
 
+    def save(self, _path):
+        """Save character to json file."""
+        file_name = (self.name + self.surname).lower() + ".json"
+        with open(os.path.join(_path, file_name), "w") as f:
+            json.dump(self.__dict__, f)
+        return os.path.join(_path, file_name)
+
+    @classmethod
+    def load(cls, file_path):
+        """Load character from json file."""
+        with open(file_path, "r") as f:
+            return cls(**json.load(f))
+
 
 class Adventure:
     """Contains randomly generated data for running a session.
