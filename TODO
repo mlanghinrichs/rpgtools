@@ -1,15 +1,11 @@
-class Character(*args, **kwargs):
-    -> Age
+Character(*args, **kwargs)
     Appearance
-    Quirks
-    /System?:
-    /-> NPC Type?
+    -> NPC Type?
     --> Characteristics
-        dnd: [randint(1,6) for i in range(4)]; list.remove(min(list))
         gsys>minion: shuffle([1, 1, 1, 2, 2, 2])
         gsys>rival: shuffle([1, 2, 2, 2, 3, 3])
         gsys>nemesis: shuffle([2, 2, 3, 3, 3, 3])
-    /--> Skills
+    --> Skills
     --> Items
     if NPC:
     --> Profession
@@ -47,19 +43,18 @@ Properly comment dnd.py and rpg.py loops
 /fix tbls_json to behave in a more reasonable manner
 /Implement non-name detail generation for characters
 /Fix README
-Fix bug where repeated adventure generation in rpg.py yields quest-givers with identical dnd stats
-Make ascii_charsheet textfile
+/Fix bug where repeated adventure generation in rpg.py yields quest-givers with identical dnd stats
+/Make ascii_charsheet textfile
 
 BEFORE v0.4:
 Proper skill/characteristic management; roll appropriate dice/mods for a character given skill check
 Generate HP/etc. and derived attributes for gsys and dnd
 Age/appearance/quirks for characters
-Implement prior command memory in rpg.py mainLoop()
 Make Character.desc() better
 Expand quirks
 Better exception handling all around
 Elegant fallback support for partially expanded settings/alternate nameschemes
-Add dramatic title element support
+/Add dramatic title element support
 Implement proper story atoms to allow story_elements to be separate
 Implementation of chartype to denote pc/npc or pc/minion/rival/nemesis
 
@@ -67,4 +62,8 @@ BEFORE v1:
 Inventory/items,
 profession/class for npcs/pcs,
 proper handling of class/archetype/whatever
-Improved pythonicness
+Weather generator
+Town generator
+Town-with-citizens generator
+    -> Add optional bounds to age generation, etc
+Add random weather to adventure locale

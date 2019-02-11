@@ -196,6 +196,9 @@ class Roll:
 class DndCharacter(rpgtools.Character):
 
     def __init__(self, **kwargs):
+        # So it isn't passed in when loading a character
+        if "setting" in kwargs:
+            del kwargs["setting"]
         super().__init__(setting="fantasy", **kwargs)
 
         self.stats = {}
@@ -207,8 +210,12 @@ class DndCharacter(rpgtools.Character):
                      "proficiencies"):
             if item in kwargs and item != "stats":
                 self.__dict__[item] = kwargs[item]
+            # Allow passing stats as an ordered tuple or as a dict
             elif item in kwargs and item == "stats":
-                self.set_stats(*kwargs["stats"])
+                if isinstance(kwargs["stats"], tuple):
+                    self.set_stats(*kwargs["stats"])
+                elif isinstance(kwargs["stats"], dict):
+                    self.stats = kwargs["stats"]
             else:
                 if item == "stats":
                     self.roll_stats()
