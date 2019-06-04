@@ -81,15 +81,20 @@ class Character:
         * age: (int)
         * personality: (dict)"""
 
-    def __init__(self, **kwargs):
-        for item in ("setting",
-                     "race",
-                     "gender",
-                     "name",
-                     "surname",
-                     "age",
-                     "personality"):
-            self.__dict__[item] = self._choose(item, kwargs)
+    def __init__(self, **k):
+        self.setting = k['setting'] or 'fantasy'
+        self.race = k['race'] or 'human'
+        self.gender = k['gender'] or 'female'
+        self.name = k['name'] or 'Leroy'
+        self.surname = k['surname'] or 'Jenkins'
+        self.age = k['age'] or 20
+        self.personality = {
+            'quirk': 'weird',
+            'strength': 'strong',
+            'flaw': 'flawed',
+            'desire': 'pleasure',
+            'fear': 'fear itself'
+        }
 
     def __str__(self):
         out = [f"{str(key).rjust(10, ' ')}: {str(val)}"
@@ -157,19 +162,17 @@ class Adventure:
 
     # Required stuff: adventure type, num_hours, num_elements,
     # locale, sub_locale, plot, objective, (hours), quest_giver, (story_atoms)
-    def __init__(self, **kwargs):
-        for item in ("adv_type",
-                     "num_hours",
-                     "num_elements",
-                     "locale",
-                     "sub_locale",
-                     "plot",
-                     "objective",
-                     "hours",
-                     "story_atoms",
-                     "quest_giver",
-                     "title"):
-            self.__dict__[item] = self._choose(item, kwargs)
+    def __init__(self, **k):
+        self.adv_type = k['adv_type'] or 'goh'
+        self.num_hours = k['num_hours'] or 3
+        self.num_elements = k['num_elements'] or 0
+        self.locale = k['locale'] or "Inside"
+        self.sub_locale = k['sub_locale'] or "Some caves, idk"
+        self.plot = k['plot'] or "heist"
+        self.objective = k['objective'] or "get some $$$"
+        self.hours = k['hours'] or []
+        self.story_atoms = k['story_atoms'] or [[]]
+        self.title = k['title'] or 'A Quest'
 
     def __str__(self):
         out = (f"\n{self.title}"
@@ -215,7 +218,7 @@ class Adventure:
                 story_elements = _extract(ADV_DICT, self.adv_type,
                                           'story_elements')
                 out = []
-                for i in range(self.num_hours):
+                for _ in range(self.num_hours):
                     elems = sample(story_elements, self.num_elements)
                     out.append(elems)
                 return out
@@ -355,7 +358,7 @@ class Table:
         for key in _dict:
             if isinstance(key, tuple):
                 # e.g. (2,5) -> range(2,6) so that 2, 3, 4, 5 are in the range
-                for i in range(key[0], key[1]+1):
+                for _ in range(key[0], key[1]+1):
                     _list.append(_dict[key])
             else:
                 _list.append(_dict[key])

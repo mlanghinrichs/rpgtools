@@ -95,7 +95,7 @@ class Roll:
         self.mod = mod
 
         self.rolls = []
-        for i in range(num):
+        for _ in range(num):
             self.rolls.append(randint(1, die))
         if dropleast:
             self.rolls.remove(min(self.rolls))
@@ -127,7 +127,7 @@ class Roll:
         return int(self.result)
 
     def __float__(self):
-        return float(self.results)
+        return float(self.result)
 
     def __add__(self, other):
         if isinstance(other, Roll):

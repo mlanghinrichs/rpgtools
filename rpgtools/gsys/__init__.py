@@ -25,10 +25,10 @@ class Roll():
         self.symbols = list("".join(pool))
 
         # For each triumph, add a success
-        for n in range(self.symbols.count("T")):
+        for _ in range(self.symbols.count("T")):
             self.symbols.append("s")
         # For each despair, add a failure
-        for n in range(self.symbols.count("D")):
+        for _ in range(self.symbols.count("D")):
             self.symbols.append("f")
 
         def cancel(*args):
